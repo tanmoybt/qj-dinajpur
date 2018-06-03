@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://tanmoy12:asdfgh123456@ds119395.mlab.com:19395/quijinndata', { useMongoClient: true })
+mongoose.connect('mongodb://tanmoy12:asdfgh123456@ds241530.mlab.com:41530/qjdj', { useMongoClient: true })
     .then(() => { // if all is ok we will be here
         console.log('Start');
         // const genRes = require('./routes/templates/genRestaurantTemplate');

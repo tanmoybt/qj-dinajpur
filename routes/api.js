@@ -10,7 +10,7 @@ const FoodTag = require('../model/Food_Tags');
 const IngredientTag = require('../model/Ingredients_Tags');
 const Regions = require('../model/Regions');
 const Profiles = require('../model/Profiles');
-const request = require('request');
+const request = require('./facebook/requests');
 
 apiRouter.route('/restaurants')
     .get(function(req, res) {
@@ -124,6 +124,7 @@ apiRouter.route('/foods')
     .post(function(req, res) {
         const food = new Food();
         food.res_id = req.body.res_id;
+        food.category = req.body.category;
         food.food_name = req.body.food_name;
         food.food_tags = req.body.food_tags;
         food.ingredient_tags = req.body.ingredient_tags;
@@ -326,7 +327,7 @@ apiRouter.route('/notification')
 
     });
 
-const PAGE_ACCESS_TOKEN = 'EAAcaq8rzMQoBAMr1FgOiTW3Y4rn3fMZApefDoSSqrztUBFD74YaC8wLR50ELPGQwcFrX7qz6JEUbeLZBDaQlimlpYj5ujLZBvOZAW8v2qCvtVhnWaKrYdqgqrQkENlPzqETQZC9A2MdUZAH6UHK42vGq8mcEuV78kCLnc1ZA7xBzwZDZD';
+const PAGE_ACCESS_TOKEN = 'EAAcaq8rzMQoBAMLg5fdc893vSV2p26QTheGOS3q8JH1Y1szZAJJwTugIMChiL1vrxdSzc1COm6cd5QHmjr6BKRO1fx1QxPynXjG1GTnOlRSduNdUaigyZC41zbOh5yKilgj5BGkfp40d5MZBSqwTZAYWfdlriItZC7kTqPUYD4AZDZD';
 
 function sendRequestcall(sender, messageData, callback) {
     request({

@@ -1,10 +1,9 @@
-const request = require('request');
+const request = require('./requests');
 const pipeline = require('./pipeline');
 const apiai = require('./apiai');
 const actions = require('./actions');
 const Profile = require('../../model/Profiles');
 
-const PAGE_ACCESS_TOKEN = 'EAAcaq8rzMQoBAMr1FgOiTW3Y4rn3fMZApefDoSSqrztUBFD74YaC8wLR50ELPGQwcFrX7qz6JEUbeLZBDaQlimlpYj5ujLZBvOZAW8v2qCvtVhnWaKrYdqgqrQkENlPzqETQZC9A2MdUZAH6UHK42vGq8mcEuV78kCLnc1ZA7xBzwZDZD';
 const resTem = require('../templates/genRestaurantTemplate');
 const foodTem = require('../templates/genFoodTemplate');
 const genWhat = require('../templates/genWhatToDo');
@@ -13,13 +12,13 @@ const genCart = require('../templates/genCartTemplate');
 
 module.exports.postbackProcessor = function (sender, postback) {
     if(postback.payload === 'GET_STARTED_PAYLOAD'){
-        getProfile(sender, function (name) {
+        request.getProfile(sender, function (name) {
             pipeline.setSenderData(sender);
             let nameFormatted= name.first_name + ' '+ name.last_name;
             pipeline.data[sender].name = nameFormatted;
 
 
-            sendRequestcall(sender, genWhat.genGetStarted(nameFormatted), function () {
+            request.sendRequestcall(sender, genWhat.genGetStarted(nameFormatted), function () {
                 const profile = new Profile();
                 profile.first_name = name.first_name;
                 profile.last_name = name.last_name;
@@ -54,12 +53,12 @@ module.exports.postbackProcessor = function (sender, postback) {
                 apiai.apiaiProcessor(sender, 'add ' + food.food_name + ' to my cart, confirm');
 
                 let messageData= {text: 'How many of '+ food.food_name+ " would you order?"};
-                sendRequest(sender, messageData);
+                request.sendRequest(sender, messageData);
 
             }
             else {
                 let messageData= {text: food.food_name+ " is already in your cart. To modify visit cart"};
-                sendRequest(sender, messageData);
+                request.sendRequest(sender, messageData);
             }
 
         });
@@ -72,8 +71,8 @@ module.exports.postbackProcessor = function (sender, postback) {
             else {
                 //apiai.apiaiProcessor(sender, 'The restaurant ' + postback.payload+ ' is picked, traced to no action');
                 let messageData = {text: "I'm loading food menu for restaurant "  + postback.payload + ". Pick other restaurants and see their menu. "};
-                sendRequestcall(sender, messageData, function () {
-                    sendRequest(sender, results);
+                request.sendRequestcall(sender, messageData, function () {
+                    request.sendRequest(sender, results);
                 });
             }
         });
@@ -82,11 +81,11 @@ module.exports.postbackProcessor = function (sender, postback) {
     else if (postback.title === 'View cart') {
         console.log('cart : ' + postback.payload);
         if (pipeline.data[sender] && pipeline.data[sender].foods) {
-            sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].foods));
+            request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].foods));
         }
         else {
             let messageData = {text: 'Nothing on your cart'};
-            sendRequest(sender, messageData);
+            request.sendRequest(sender, messageData);
         }
     }
 
@@ -126,12 +125,12 @@ module.exports.postbackProcessor = function (sender, postback) {
             apiai.apiaiProcessor(sender, 'change the amount of this item ' + food.food_name + ' from '+ food.quantity+' confirm on cart ready');
 
             let messageData= {text: 'You currently have '+food.quantity+' '+ food.food_name+ " in your cart now, How many would you order?"};
-            sendRequest(sender, messageData);
+            request.sendRequest(sender, messageData);
 
         }
         else {
             let messageData= {text: food.food_name+ " not found in Cart"};
-            sendRequest(sender, messageData);
+            request.sendRequest(sender, messageData);
         }
     }
 
@@ -152,13 +151,13 @@ module.exports.postbackProcessor = function (sender, postback) {
         if(flag){
             pipeline.data[sender].foods.splice(foodIndex, 1);
             let messageData= {text: food.food_name+ " removed from cart."};
-            sendRequestcall(sender, messageData, function () {
-                sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].foods));
+            request.sendRequestcall(sender, messageData, function () {
+                request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].foods));
             });
         }
         else {
             let messageData= {text: food.food_name+ " not found in Cart"};
-            sendRequest(sender, messageData);
+            request.sendRequest(sender, messageData);
         }
     }
 
@@ -167,21 +166,21 @@ module.exports.postbackProcessor = function (sender, postback) {
             if(pipeline.data[sender].location.address && !pipeline.data[sender].location.confirmed){
                 apiai.apiaiProcessor(sender, 'ready for checkout, the address is ' + pipeline.data[sender].location.address);
                 let messageData = {text: 'Great! Would you like delivery at this address : '+ pipeline.data[sender].location.address};
-                sendRequest(sender, messageData);
+                request.sendRequest(sender, messageData);
             }
             else {
                 apiai.apiaiProcessor(sender, 'ready for checkout, without an addrress');
-                sendRequest(sender, genLoc.genGetAddress());
+                request.sendRequest(sender, genLoc.genGetAddress());
             }
         }
         else {
             let messageData = {text: "Please add items to cart for checkout"};
-            sendRequest(sender, messageData);
+            request.sendRequest(sender, messageData);
         }
     }
 
     else if (postback.payload === 'GET_ORDER'){
-        sendRequest(sender, {text: ':D'});
+        request.sendRequest(sender, {text: ':D'});
     }
 };
 
@@ -192,11 +191,11 @@ function viewMoreProcessor(sender, address, zipcode, region) {
             else {
                 if (results.attachment.payload.elements.length > 1) {
                     pipeline.data[sender].restaurant.index += 1;
-                    sendRequest(sender, results);
+                    request.sendRequest(sender, results);
                 }
                 else {
                     let messageData = {text: "Sorry, No more restaurants, select from the previous list"};
-                    sendRequest(sender, messageData);
+                    request.sendRequest(sender, messageData);
                 }
             }
         });
@@ -207,11 +206,11 @@ function viewMoreProcessor(sender, address, zipcode, region) {
             else {
                 if (results.attachment.payload.elements.length > 1) {
                     pipeline.data[sender].restaurant.index++;
-                    sendRequest(sender, results);
+                    request.sendRequest(sender, results);
                 }
                 else {
                     let messageData = {text: "Sorry, No more restaurants, select from the previous list"};
-                    sendRequest(sender, messageData);
+                    request.sendRequest(sender, messageData);
                 }
             }
         });
@@ -223,85 +222,18 @@ function viewMoreProcessor(sender, address, zipcode, region) {
                 if (results.attachment.payload.elements.length > 1) {
 
                     pipeline.data[sender].restaurant.index++;
-                    sendRequest(sender, results);
+                    request.sendRequest(sender, results);
                 }
                 else {
                     let messageData = {text: "Sorry, No more restaurants, select from the previous list"};
-                    sendRequest(sender, messageData);
+                    request.sendRequest(sender, messageData);
                 }
             }
         });
     }
 }
 
-function sendRequest(sender, messageData) {
-    request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
-        qs: {access_token: PAGE_ACCESS_TOKEN},
-        method: "POST",
-        json: {
-            recipient: {id: sender},
-            message: messageData
-        }
-    }, function (err, response, body) {
-        if (err) {
-            console.log("sending error");
-            console.log(err);
-        } else if (response.body.error) {
-            console.log("response body error");
-            console.log(response.body.error);
-        }
-    })
-}
 
-function sendRequestcall(sender, messageData, callback) {
-    request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
-        qs: {access_token: PAGE_ACCESS_TOKEN},
-        method: "POST",
-        json: {
-            recipient: {id: sender},
-            message: messageData
-        }
-    }, function (err, response, body) {
-        if (err) {
-            console.log("sending error");
-            console.log(err);
-        } else if (response.body.error) {
-            console.log("response body error");
-            console.log(response.body.error);
-        }
-        else {
-            callback();
-        }
-    })
-}
-
-function getProfile(PSID, callback){
-    let link = "https://graph.facebook.com/v2.6/" + PSID + "?fields=first_name,last_name,profile_pic&access_token=" +PAGE_ACCESS_TOKEN;
-    //console.log(link);
-    let name;
-    request(link, function (error, response, body) {
-        console.log('error:', error); // Print the error if one occurred
-        //console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-        //console.log(JSON.parse(body, null, 2));
-        let info = JSON.parse(body, null, 2);
-        //console.log(JSON.parse(response, null, 2));// Print the HTML for the Google homepage.
-        console.log(info.first_name);
-        console.log(info.last_name);
-
-        console.log(info);
-        if(body){
-            name= {
-                first_name: info.first_name,
-                last_name: info.last_name
-            };
-        }
-        callback(name);
-    });
-
-
-}
 
 function addProfile (profile,cb){
     Profile.find({sender_id : profile.sender_id}, function (err, docs) {

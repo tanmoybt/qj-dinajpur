@@ -3,18 +3,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const Router = express.Router();
 const request = require('request');
-const apiaiApp = require('apiai')('67efa2ecd2514286b05cb58fdc3643fc');
-const NodeGeocoder = require('node-geocoder');
 
-const PAGE_ACCESS_TOKEN = 'EAAcaq8rzMQoBAMr1FgOiTW3Y4rn3fMZApefDoSSqrztUBFD74YaC8wLR50ELPGQwcFrX7qz6JEUbeLZBDaQlimlpYj5ujLZBvOZAW8v2qCvtVhnWaKrYdqgqrQkENlPzqETQZC9A2MdUZAH6UHK42vGq8mcEuV78kCLnc1ZA7xBzwZDZD';
-
-
-const resTem = require('../templates/genRestaurantTemplate');
-const foodTem = require('../templates/genFoodTemplate');
-const genWhat = require('../templates/genWhatToDo');
-const genLoc = require('../templates/genGetLocation');
-const genCart = require('../templates/genCartTemplate');
-const pipeline = require('./pipeline');
 const postback = require('./postbacks');
 const messages = require('./messages');
 

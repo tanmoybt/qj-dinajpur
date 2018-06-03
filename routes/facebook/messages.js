@@ -6,12 +6,9 @@ const genLoc = require('../templates/genGetLocation');
 const genCart = require('../templates/genCartTemplate');
 const pipeline = require('./pipeline');
 const postback = require('./postbacks');
-const request = require('request');
+const request = require('./requests');
 const apiai = require('./apiai');
 const actions= require('./actions');
-
-
-const PAGE_ACCESS_TOKEN = 'EAAcaq8rzMQoBAMr1FgOiTW3Y4rn3fMZApefDoSSqrztUBFD74YaC8wLR50ELPGQwcFrX7qz6JEUbeLZBDaQlimlpYj5ujLZBvOZAW8v2qCvtVhnWaKrYdqgqrQkENlPzqETQZC9A2MdUZAH6UHK42vGq8mcEuV78kCLnc1ZA7xBzwZDZD';
 
 
 module.exports.messagesProcessor = function (sender, message) {
@@ -56,8 +53,8 @@ module.exports.messagesProcessor = function (sender, message) {
                     let messageData= {text: 'The location is traced from get location ' + res[0].formattedAddress + ', full confirmation, no action'};
                     apiai.apiaiProcessor(sender, messageData.text);
                     messageData= {text: 'Your address is ' + res[0].formattedAddress};
-                    sendRequestcall(sender, messageData, function () {
-                        sendRequest(sender, {text: "Give me a phone number to find you and we'll be done"});
+                    request.sendRequestcall(sender, messageData, function () {
+                        request.sendRequest(sender, {text: "Give me a phone number to find you and we'll be done"});
                     });
 
                 });
@@ -70,7 +67,7 @@ module.exports.messagesProcessor = function (sender, message) {
             apiai.apiaiProcessor(sender, message.quick_reply.payload);
         }
         else if(message.quick_reply.payload === 'GET_ORDER'){
-            sendRequest(sender, {text: 'done'});
+            request.sendRequest(sender, {text: 'done'});
         }
         else {
             let res = message.quick_reply.payload.split("_");
@@ -90,7 +87,7 @@ module.exports.messagesProcessor = function (sender, message) {
 function locationProcessor(sender, address, zipcode, region) {
     if(!address && region && zipcode){
         let messageData = {text: "I'm loading restaurants from "+ region + " for you..."};
-        sendRequestcall(sender, messageData, function () {
+        request.sendRequestcall(sender, messageData, function () {
             resTem.genRestaurantByRegion(region, 0, function (err, results) {
                 if (err) throw err;
                 else {
@@ -102,16 +99,16 @@ function locationProcessor(sender, address, zipcode, region) {
                             value: true
                         };
                         pipeline.data[sender].restaurant.index+=1;
-                        sendRequest(sender, results);
+                        request.sendRequest(sender, results);
                         apiai.apiaiProcessor(sender, 'region is '+ region + " take no action due to quick reply");
                         actions.setLastAction(sender, 'restaurantsShowing', null, []);
                     }
                     else {
                         messageData = {text: "Sorry, delivery in this area is currently off."};
-                        sendRequestcall(sender, messageData, function () {
+                        request.sendRequestcall(sender, messageData, function () {
                             genLoc.genGetRegion(function(err, messageData){
                                 if(!err){
-                                    sendRequest(sender, messageData);
+                                    request.sendRequest(sender, messageData);
                                 }
                             });
                         });
@@ -122,9 +119,9 @@ function locationProcessor(sender, address, zipcode, region) {
     }
     else if(address && zipcode && region){
         let messageData = {text: 'your location is ' + address};
-        sendRequestcall(sender, messageData, function () {
+        request.sendRequestcall(sender, messageData, function () {
             messageData = {text: "I'm loading restaurants for you..."};
-            sendRequestcall(sender, messageData, function () {
+            request.sendRequestcall(sender, messageData, function () {
                 resTem.genRestaurantByZip('1111',0, function (err, results) {
                     if (err) throw err;
                     else {
@@ -137,16 +134,16 @@ function locationProcessor(sender, address, zipcode, region) {
                                 value: true
                             };
                             pipeline.data[sender].restaurant.index+=1;
-                            sendRequest(sender, results);
+                            request.sendRequest(sender, results);
                             apiai.apiaiProcessor(sender, "The location is traced from get location " + address + ' full confirmation, no action');
                             actions.setLastAction(sender, 'restaurantsShowing', null, []);
                         }
                         else {
                             messageData = {text: "Sorry, I could not find restaurants in this area. You could choose a region"};
-                            sendRequestcall(sender, messageData, function () {
+                            request.sendRequestcall(sender, messageData, function () {
                                 genLoc.genGetRegion(function(err, messageData){
                                 if(!err){
-                                    sendRequest(sender, messageData);
+                                    request.sendRequest(sender, messageData);
                                 }
                             });
                             });
@@ -158,9 +155,9 @@ function locationProcessor(sender, address, zipcode, region) {
     }
     else if(address && region){
         let messageData = {text: 'your location is ' + address};
-        sendRequestcall(sender, messageData, function () {
+        request.sendRequestcall(sender, messageData, function () {
             messageData = {text: "I'm loading restaurants for you..."};
-            sendRequestcall(sender, messageData, function () {
+            request.sendRequestcall(sender, messageData, function () {
                 resTem.genRestaurantByRegion(region,0, function (err, results) {
                     if (err) throw err;
                     else {
@@ -172,16 +169,16 @@ function locationProcessor(sender, address, zipcode, region) {
                                 value: true
                             };
                             pipeline.data[sender].restaurant.index+=1;
-                            sendRequest(sender, results);
+                            request.sendRequest(sender, results);
                             apiai.apiaiProcessor(sender, "The location is traced from get location " + address + ' full confirmation, no action');
                             actions.setLastAction(sender, 'restaurantsShowing', null, []);
                         }
                         else {
                             messageData = {text: "Sorry, I could not find restaurants in this area. You could choose a region"};
-                            sendRequestcall(sender, messageData, function () {
+                            request.sendRequestcall(sender, messageData, function () {
                                 genLoc.genGetRegion(function(err, messageData){
                                     if(!err){
-                                        sendRequest(sender, messageData);
+                                        request.sendRequest(sender, messageData);
                                     }
                                 });
                             });
@@ -198,52 +195,8 @@ function locationProcessor(sender, address, zipcode, region) {
             value: true
         };
         let messageData = {text: "Sorry, I could not find restaurants in this area. You could choose a region"};
-        sendRequestcall(sender, messageData, function () {
-            sendRequest(sender, genLoc.genGetRegion());
+        request.sendRequestcall(sender, messageData, function () {
+            request.sendRequest(sender, genLoc.genGetRegion());
         });
     }
 }
-
-function sendRequest(sender, messageData) {
-    request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
-        qs: {access_token: PAGE_ACCESS_TOKEN},
-        method: "POST",
-        json: {
-            recipient: {id: sender},
-            message: messageData
-        }
-    }, function (err, response, body) {
-        if (err) {
-            console.log("sending error");
-            console.log(err);
-        } else if (response.body.error) {
-            console.log("response body error");
-            console.log(response.body.error);
-        }
-    })
-}
-
-function sendRequestcall(sender, messageData, callback) {
-    request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
-        qs: {access_token: PAGE_ACCESS_TOKEN},
-        method: "POST",
-        json: {
-            recipient: {id: sender},
-            message: messageData
-        }
-    }, function (err, response, body) {
-        if (err) {
-            console.log("sending error");
-            console.log(err);
-        } else if (response.body.error) {
-            console.log("response body error");
-            console.log(response.body.error);
-        }
-        else {
-            callback();
-        }
-    })
-}
-

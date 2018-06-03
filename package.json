@@ -18,6 +18,7 @@
     "apiai": "^4.0.3",
     "axios": "^0.16.2",
     "cors": "^2.8.4",
+    "eslint": "^4.19.1",
     "express": "^4.16.3",
     "mongoose": "^4.13.13",
     "mongoose-paginate": "^5.0.3",

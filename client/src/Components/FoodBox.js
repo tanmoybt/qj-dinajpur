@@ -28,7 +28,7 @@ export default class FoodBox extends Component {
 
         return (
             <div>
-                <h4>{this.props.food.food_name}</h4>
+                <h4>{this.props.food.category} - {this.props.food.food_name}</h4>
                 <h5>Food Tags: <strong>{this.props.food.food_tags.join()}</strong>; Ingredient Tags:<strong>
                     {this.props.food.ingredient_tags.join()}</strong></h5>
                 {sizes}

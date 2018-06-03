@@ -14,6 +14,7 @@ export default class Foods extends Component {
         super(props);
         this.state = {
             res_id: '',
+            category: '',
             food_name: '',
             food_type: '',
             food_size: [{
@@ -51,6 +52,7 @@ export default class Foods extends Component {
 
         };
 
+        this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.handleFoodNameChange = this.handleFoodNameChange.bind(this);
         this.handleFoodTypeChange = this.handleFoodTypeChange.bind(this);
         this.handleFoodSizeChange = this.handleFoodSizeChange.bind(this);
@@ -90,6 +92,11 @@ export default class Foods extends Component {
 
     handleFoodNameChange(e) {
         this.setState({food_name: e.target.value});
+    }
+
+    handleCategoryChange(e){
+        this.setState({category: e.target.value});
+
     }
 
     handleDescChange(e){
@@ -142,6 +149,7 @@ export default class Foods extends Component {
 
     handleFoodSubmit(e) {
         e.preventDefault();
+        let category = this.state.category.trim();
         let food_name = this.state.food_name.trim();
         let food_sizes = this.state.food_size;
 
@@ -153,7 +161,7 @@ export default class Foods extends Component {
         let image = this.state.image;
         let desc = this.state.desc;
 
-        if (!food_name || !food_sizes[0].price) {
+        if (!food_name || !food_sizes[0].price || !category) {
             return;
         }
         let res = 1;
@@ -161,7 +169,7 @@ export default class Foods extends Component {
 
         console.log(res);
         let food = {
-            _id: food_name, res_id: res, food_name: food_name, food_tags: food_tags, ingredient_tags: ing_tags,
+            _id: food_name, res_id: res, category: category, food_name: food_name, food_tags: food_tags, ingredient_tags: ing_tags,
             desc: desc, food_size: food_sizes, cuisine: cuisine, rating: rating, image: image
         };
 
@@ -241,6 +249,10 @@ export default class Foods extends Component {
                 {foodNodes}
                 <br/><br/>
                     <div>
+                        <label htmlFor="category">Category:</label>
+                        <input type="text" className="form-control" value={this.state.category}
+                               onChange={this.handleCategoryChange} id="category"/>
+
                         <label htmlFor="name">Food Name:</label>
                         <input type="text" className="form-control" value={this.state.food_name}
                                onChange={this.handleFoodNameChange} id="name"/>
