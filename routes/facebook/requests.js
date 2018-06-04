@@ -45,6 +45,23 @@ module.exports.sendRequestcall = function (sender, messageData, callback) {
     })
 }
 
+module.exports.sendRequestasync = function (sender, messageData) {
+	return new Promise(function(resolve, reject) {
+	    request({
+	        url: "https://graph.facebook.com/v2.6/me/messages",
+	        qs: {access_token: PAGE_ACCESS_TOKEN},
+	        method: "POST",
+	        json: {
+	            recipient: {id: sender},
+	            message: messageData
+	        }
+	    }, function(err, resp, body){
+	    	if (err) { reject(err); }
+      		else { resolve({resp: resp, body: body}); }
+	    });
+    });
+}
+
 module.exports.getProfile = function (PSID, callback){
     let link = "https://graph.facebook.com/v2.6/" + PSID + "?fields=first_name,last_name,profile_pic&access_token=" +PAGE_ACCESS_TOKEN;
     //console.log(link);

@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const apiai = require('./routes/facebook/apiai');
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.use(function(req, res, next) {
     res.setHeader('Cache-Control', 'no-cache');
     next();
 });
+
+// apiai.apiResetContext();
 
 
 // Serve static files from the React app

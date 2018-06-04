@@ -67,7 +67,7 @@ module.exports.genCart = function (sender) {
     }
 };
 
-module.exports.genCartCarousel = function (foods, address, phone) {
+module.exports.genCartCarousel = function (restaurant, foods) {
     if (!foods.size) {
         let amount = 0;
 
@@ -77,7 +77,7 @@ module.exports.genCartCarousel = function (foods, address, phone) {
             return (
                 {
                     "title": food.food_name + ', Qty. ' + food.quantity + ', price: Tk ' + food.price,
-                    "subtitle": food.cuisine + ', Rating :' + food.rating,
+                    "subtitle": food.size,
                     "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
                     "default_action": {
                         "type": "web_url",
@@ -102,8 +102,8 @@ module.exports.genCartCarousel = function (foods, address, phone) {
         });
         let messelements =
             {
-                "title": 'Cart total : Tk ' + amount + ' from restaurant',
-                "subtitle": 'hi',
+                "title": 'Cart total : Tk ' + amount + ' from ' + restaurant,
+                "subtitle": 'Cart',
                 "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
                 "default_action": {
                     "type": "web_url",

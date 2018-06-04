@@ -86,26 +86,31 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
 
     else if(action === 'showMenuOnRestaurant'){
         setLastAction(sender, 'none', '', []);
+        console.log(parameters.restaurant_name);
+
         foodTem.genFoodByRestaurant(parameters.restaurant_name, function (err, results) {
-            if (err) throw err;
+            console.log('full result : ' + JSON.stringify(results, null, 2));
+            if(result[0].data.attachment.payload.elements.length > 0) {
+                let messageData = {text: "food menu for restaurant " + parameters.restaurant_name + ". Pick other restaurants and see their menu. "};
+            
+                request.sendRequestcall(sender, messageData, function(){
+                    results.forEach(function(result){
+                        //apiai.apiaiProcessor(sender, 'The restaurant ' + postback.payload+ ' is picked, traced to no action');
+                        request.sendRequestcall(sender, {text: result.cat}, function(){
+                            request.sendRequest(sender, result.data);
+                        })
+                    });
+                });
+            }
             else {
-                if(results.attachment.payload.elements.length > 0) {
-                    //apiai.apiaiProcessor(sender, 'The restaurant ' + postback.payload+ ' is picked, traced to no action');
-                    let messageData = {text: "I'm loading food menu for restaurant " + parameters.restaurant_name + ". Pick other restaurants and see their menu. "};
-                    request.sendRequestcall(sender, messageData, function () {
-                        request.sendRequest(sender, results);
+                let messageData = {text: "Sorry, " + parameters.restaurant_name + " is not in our list yet, You could checkout other restaurants"};
+                request.sendRequestcall(sender, messageData, function () {
+                    genLoc.genGetLocation(function(err, messageData){
+                        if(!err){
+                            request.sendRequest(sender, messageData);
+                        }
                     });
-                }
-                else {
-                    let messageData = {text: "Sorry, " + parameters.restaurant_name + " is not in our list yet, You could checkout other restaurants"};
-                    request.sendRequestcall(sender, messageData, function () {
-                        genLoc.genGetLocation(function(err, messageData){
-                            if(!err){
-                                request.sendRequest(sender, messageData);
-                            }
-                        });
-                    });
-                }
+                });
             }
         });
     }
@@ -190,6 +195,16 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         let food = pipeline.data[sender].foodattending;
         pipeline.data[sender].foodattending= {};
         let messageData= {text: food.food_name + ' kept in order. You can view your cart for checkout or continue shopping.'};
+        request.sendRequest(sender, messageData);
+    }
+
+    else if(action === 'changeRestaurant.changeRestaurant-yes'){
+        pipeline.data[sender].foodattending= foodinline;
+        pipeline.data[sender].restaurantinline= food;
+
+        apiai.apiaiProcessor(sender, 'add ' + pipeline.data[sender].foodattending.food_name + ' to my cart, confirm');
+
+        let messageData= {text: 'How many of '+ pipeline.data[sender].foodattending.food_name + "(" + pipeline.data[sender].foodattending.size + ") would you order?"};
         request.sendRequest(sender, messageData);
     }
 

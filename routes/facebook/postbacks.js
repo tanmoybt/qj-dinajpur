@@ -3,6 +3,7 @@ const pipeline = require('./pipeline');
 const apiai = require('./apiai');
 const actions = require('./actions');
 const Profile = require('../../model/Profiles');
+const generator = require('./generator');
 
 const resTem = require('../templates/genRestaurantTemplate');
 const foodTem = require('../templates/genFoodTemplate');
@@ -31,48 +32,56 @@ module.exports.postbackProcessor = function (sender, postback) {
         });
     }
 
-    else if (postback.title === 'Add to cart') {
+    else if (postback.payload.includes('FOOD')) {
         pipeline.setSenderData(sender);
         console.log('Food : ' + postback.payload);
-        foodTem.findFoodByID(postback.payload, function (err, food) {
-            if (err) throw err;
+        let items = postback.payload.split('_');
+
+        foodTem.findFoodSizeByID(items[1], items[2], function (err, items) {
+            let food = items.food;
+            let res = items.res;
             console.log(food);
-            console.log('more: ' + JSON.stringify(pipeline.data[sender], null,2));
-            let flag = true;
-            pipeline.data[sender].foods.forEach(function (foodItem) {
-                console.log((typeof foodItem.food_id)+' ' +foodItem.food_id);
-                console.log((typeof food.food_id)+' ' +food.food_id);
-                if(foodItem.food_id.equals(food.food_id)){
-                    console.log('falsify');
-                    flag= false;
+            console.log();
+            console.log("res found ");
+            console.log(res);
+
+            if(pipeline.data[sender].restaurant.name){
+                if(pipeline.data[sender].restaurant.name === res.name){
+                    // attending
+                    generator.foodAttending(err, sender,  res, food);
                 }
-            });
-            if(flag){
-                pipeline.data[sender].foodattending= food;
-
-                apiai.apiaiProcessor(sender, 'add ' + food.food_name + ' to my cart, confirm');
-
-                let messageData= {text: 'How many of '+ food.food_name+ " would you order?"};
-                request.sendRequest(sender, messageData);
-
+                else{
+                    //in line
+                    generator.foodInLine(err, sender,  res, food);
+                }
             }
-            else {
-                let messageData= {text: food.food_name+ " is already in your cart. To modify visit cart"};
-                request.sendRequest(sender, messageData);
+            else{
+                //attending and restaurant
+                generator.foodAttendingRes(err, sender, res, food);
             }
-
         });
     }
 
     else if (postback.title === 'Pick') {
         console.log('Restaurant : ' + postback.payload);
+        
         foodTem.genFoodByRestaurant(postback.payload, function (err, results) {
-            if (err) throw err;
+            console.log('full result : ' + JSON.stringify(results, null, 2));
+            if(results[0].data.attachment.payload.elements.length > 0) {
+                let messageData = {text: "food menu for restaurant " + postback.payload + ". Pick other restaurants and see their menu. "};
+            
+                request.sendRequestcall(sender, messageData, function(){
+                    sendFoods(sender, results);
+                });
+            }
             else {
-                //apiai.apiaiProcessor(sender, 'The restaurant ' + postback.payload+ ' is picked, traced to no action');
-                let messageData = {text: "I'm loading food menu for restaurant "  + postback.payload + ". Pick other restaurants and see their menu. "};
+                let messageData = {text: "Sorry, " + postback.payload + " is not in our list yet, You could checkout other restaurants"};
                 request.sendRequestcall(sender, messageData, function () {
-                    request.sendRequest(sender, results);
+                    genLoc.genGetLocation(function(err, messageData){
+                        if(!err){
+                            request.sendRequest(sender, messageData);
+                        }
+                    });
                 });
             }
         });
@@ -81,12 +90,19 @@ module.exports.postbackProcessor = function (sender, postback) {
     else if (postback.title === 'View cart') {
         console.log('cart : ' + postback.payload);
         if (pipeline.data[sender] && pipeline.data[sender].foods) {
-            request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].foods));
+            request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].restaurant.name, pipeline.data[sender].foods));
         }
         else {
             let messageData = {text: 'Nothing on your cart'};
             request.sendRequest(sender, messageData);
         }
+    }
+
+    else if (postback.payload === 'CANCEL_CART'){
+        pipeline.clearSenderData(sender);
+        let messageData = {text: 'Cart is cleared'};
+        request.sendRequest(sender, messageData);
+        
     }
 
     else if (postback.title === 'Restart bot') {
@@ -152,7 +168,7 @@ module.exports.postbackProcessor = function (sender, postback) {
             pipeline.data[sender].foods.splice(foodIndex, 1);
             let messageData= {text: food.food_name+ " removed from cart."};
             request.sendRequestcall(sender, messageData, function () {
-                request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].foods));
+                request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].restaurant.name, pipeline.data[sender].foods));
             });
         }
         else {
@@ -246,3 +262,18 @@ function addProfile (profile,cb){
         }
     });
 }
+
+async function sendFoods (sender, results) {
+  for (let i = 0; i < results.length; i++) {
+    let res = await request.sendRequestasync(sender, {text: results[i].cat});
+    res = await request.sendRequestasync(sender, results[i].data);
+    // console.log(result);
+  };
+}
+
+// async function sendFoods(sender, results) {
+//   for (let i = 0; i < 5; i++) {
+//     let result = await req('http://google.com');
+//     console.log(result.resp.statusCode, i);
+//   };
+// };
