@@ -5,6 +5,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const apiai = require('./routes/facebook/apiai');
 
+const entities = require('./entities');
+
 const app = express();
 
 mongoose.Promise = require('bluebird');
@@ -39,8 +41,6 @@ app.use(function(req, res, next) {
     next();
 });
 
-// apiai.apiResetContext();
-
 
 // Serve static files from the React app
 
@@ -60,6 +60,9 @@ app.use(function(req, res) {
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
+
+
+
 
 const port = process.env.PORT || 5000;
 

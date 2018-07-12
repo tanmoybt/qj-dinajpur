@@ -114,7 +114,7 @@ module.exports.findFoodSizeByID = function (food_id, size_id, callback) {
 
 function makeTemplate(foods) {
     if (!foods.size) {
-        let messageElements = foods.map(category => {
+        let messageElements = foods.map(food => {
             return (
                 {
                     "title": food.food_name,

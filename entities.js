@@ -17,58 +17,122 @@
 'use strict';
 
 // var apiai = require("../module/apiai");
-var apiai = require("apiai");
-
-var app = apiai("67efa2ecd2514286b05cb58fdc3643fc");
+const apiai = require('./routes/facebook/apiai');
+const Cuisine = require('./model/Cuisines');
+const FoodTag = require('./model/Food_Tags');
+const IngredientTag = require('./model/Ingredients_Tags');
+const Restaurant = require('./model/Restaurants');
 
 var sessionId = "1";
 
-var user_entities = [{
-    name: 'cuisine',
-    extend: true,
-    entries: [
-        {
-            value: 'Firefox',
-            synonyms: ['Firefox', 'frefox']
-        },
-        {
-            value: 'XCode',
-            synonyms: ['XCode']
-        },
-        {
-            value: 'Sublime Text',
-            synonyms: ['Sublime Text']
+var user_entities = [
+  {
+    "synonyms": [
+      "kiwi"
+    ],
+    "value": "kiwi"
+  }
+]
+
+module.exports.makeCuisineEntities= function(){
+    
+    let data = [];
+    Cuisine.find(function(err, cuisines){
+        
+        console.log('cuisines' + cuisines);
+        cuisines.forEach(function(cuisine){
+            let subData= {
+                value: cuisine.cuisine
+            }
+
+            data.push(subData);
+        })
+        console.log('dtat : ' + JSON.stringify(data, null, 2));
+        let entities= {
+            entries: data,
+            name: 'cuisine'
         }
-    ]
-}];
+        apiai.buildEntity(entities, function(){});
+    })
+    
+}
 
-var user_entities_body = {
-    sessionId: sessionId,
-    entities: user_entities
-};
 
-var user_entities_request = app.userEntitiesRequest(user_entities_body);
+module.exports.makeFoodTagEntities= function(){
+    
+    let data = [];
+    FoodTag.find(function(err, foodtags){
+        
+        console.log('foodtags' + foodtags);
+        foodtags.forEach(function(foodtag){
+            let subData= {
+                value: foodtag.tag
+            }
 
-user_entities_request.on('response', function(response) {
-    console.log('User entities response: ');
-    console.log(JSON.stringify(response, null, 4));
+            data.push(subData);
+        })
+        console.log('dtat : ' + JSON.stringify(data, null, 2));
+        let entities= {
+            entries: data,
+            name: 'food_tag'
+        }
+        apiai.buildEntity(entities, function(){});
+    })
+    
+}
+ 
 
-    var request = app.textRequest('open XCode', {sessionId: sessionId});
 
-    request.on('response', function(response) {
-        console.log('Query response: ');
-        console.log(JSON.stringify(response, null, 4));
-    });
+module.exports.makeIngredientTagEntities= function(){
+    
+    let data = [];
+    IngredientTag.find(function(err, ingredienttags){
+        
+        console.log('foodtags' + ingredienttags);
+        ingredienttags.forEach(function(ingredienttag){
+            let subData= {
+                value: ingredienttag.tag
+            }
 
-    request.on('error', function(error) {
-        console.log(error);
-    });
+            data.push(subData);
+        })
+        console.log('dtat : ' + JSON.stringify(data, null, 2));
+        let entities= {
+            entries: data,
+            name: 'ingredient_tag'
+        }
+        apiai.buildEntity(entities, function(){});
+    })
+    
+}
 
-    request.end();
-});
 
-user_entities_request.on('error', function(error) {
-    console.log(error);
-});
 
-user_entities_request.end();
+module.exports.makeRestaurantNameEntities= function(){
+    
+    let data = [];
+    Restaurant.find(function(err, restaurants){
+        
+        console.log('foodtags' + restaurants);
+        restaurants.forEach(function(restaurant){
+            let subData= {
+                value: restaurant.name
+            }
+
+            data.push(subData);
+        })
+        console.log('dtat : ' + JSON.stringify(data, null, 2));
+        let entities= {
+            entries: data,
+            name: 'restaurant_name'
+        }
+        apiai.buildEntity(entities, function(){});
+    })
+    
+}
+
+// entities.makeCuisineEntities();
+// entities.makeFoodTagEntities ();
+// entities.makeFoodTagEntities ();
+// entities.makeIngredientTagEntities();
+// entities.makeRestaurantNameEntities();

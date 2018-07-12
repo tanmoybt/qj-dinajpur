@@ -18,7 +18,7 @@ module.exports.postbackProcessor = function (sender, postback) {
             let nameFormatted= name.first_name + ' '+ name.last_name;
             pipeline.data[sender].name = nameFormatted;
 
-
+            apiai.apiResetContext(sender);
             request.sendRequestcall(sender, genWhat.genGetStarted(nameFormatted), function () {
                 const profile = new Profile();
                 profile.first_name = name.first_name;

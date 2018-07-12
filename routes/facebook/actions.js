@@ -199,8 +199,8 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     }
 
     else if(action === 'changeRestaurant.changeRestaurant-yes'){
-        pipeline.data[sender].foodattending= foodinline;
-        pipeline.data[sender].restaurantinline= food;
+        pipeline.data[sender].foodattending= pipeline.data[sender].foodinline;
+        pipeline.data[sender].restaurantinline= pipeline.data[sender].food;
 
         apiai.apiaiProcessor(sender, 'add ' + pipeline.data[sender].foodattending.food_name + ' to my cart, confirm');
 
@@ -286,10 +286,12 @@ function sendPrevAction(sender){
             }
         }
         else {
+            apiai.apiResetContext(sender);
             request.sendRequest(sender,genWhat.genWhatToDo());
         }
     }
     else{
+        apiai.apiResetContext(sender);
         request.sendRequest(sender,genWhat.genWhatToDo());
     }
 }
