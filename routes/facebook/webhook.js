@@ -9,7 +9,7 @@ const messages = require('./messages');
 
 /* For Facebook Validation */
 Router.get('/', (req, res) => {
-    if (req.query['hub.mode'] && req.query['hub.verify_token'] === 'quijinnbot') {
+    if (req.query['hub.mode'] && req.query['hub.verify_token'] === 'foodbot') {
         res.status(200).send(req.query['hub.challenge']);
     } else {
         res.status(403).end();

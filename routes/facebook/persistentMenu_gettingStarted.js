@@ -50,3 +50,11 @@ curl -X POST -H "Content-Type: application/json" -d '{
 }' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=EAAcaq8rzMQoBAMr1FgOiTW3Y4rn3fMZApefDoSSqrztUBFD74YaC8wLR50ELPGQwcFrX7qz6JEUbeLZBDaQlimlpYj5ujLZBvOZAW8v2qCvtVhnWaKrYdqgqrQkENlPzqETQZC9A2MdUZAH6UHK42vGq8mcEuV78kCLnc1ZA7xBzwZDZD"
 
 
+
+// whitelist
+
+curl -X POST -H "Content-Type: application/json" -d '{
+  "whitelisted_domains":[
+    "https://www.facebook.com"
+  ]
+}' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=EAAZAgcMnsu28BAA385K4sEF2ruqA7jouegw2TgwSSEUhjLvvRpvlYVyrieMrJHtRUQju88GBNIwlZAwfM1Dcth4tAOCJt2EjnvCpX7C21PZCZAZBZCQ01lxXP8J0cPyysEWK4xK5HNfPnFl3jtoZBiWNgvrO1O7RhPNYmsDB3cwlgZDZD" 

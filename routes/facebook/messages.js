@@ -88,7 +88,7 @@ function locationProcessor(sender, address, zipcode, region) {
     if(!address && region && zipcode){
         let messageData = {text: "I'm loading restaurants from "+ region + " for you..."};
         request.sendRequestcall(sender, messageData, function () {
-            resTem.genRestaurantByRegion(region, 0, function (err, results) {
+            resTem.genRestaurantByRegionGeneric(region, 0, function (err, results) {
                 if (err) throw err;
                 else {
                     if (results.attachment.payload.elements.length > 1) {
@@ -100,7 +100,6 @@ function locationProcessor(sender, address, zipcode, region) {
                         };
                         pipeline.data[sender].restaurant.index+=1;
                         request.sendRequest(sender, results);
-                        apiai.apiaiProcessor(sender, 'region is '+ region + " take no action due to quick reply");
                         actions.setLastAction(sender, 'restaurantsShowing', null, []);
                     }
                     else {
@@ -135,7 +134,6 @@ function locationProcessor(sender, address, zipcode, region) {
                             };
                             pipeline.data[sender].restaurant.index+=1;
                             request.sendRequest(sender, results);
-                            apiai.apiaiProcessor(sender, "The location is traced from get location " + address + ' full confirmation, no action');
                             actions.setLastAction(sender, 'restaurantsShowing', null, []);
                         }
                         else {
@@ -158,7 +156,7 @@ function locationProcessor(sender, address, zipcode, region) {
         request.sendRequestcall(sender, messageData, function () {
             messageData = {text: "I'm loading restaurants for you..."};
             request.sendRequestcall(sender, messageData, function () {
-                resTem.genRestaurantByRegion(region,0, function (err, results) {
+                resTem.genRestaurantByRegionGeneric(region,0, function (err, results) {
                     if (err) throw err;
                     else {
                         if (results.attachment.payload.elements.length > 1) {
@@ -170,7 +168,6 @@ function locationProcessor(sender, address, zipcode, region) {
                             };
                             pipeline.data[sender].restaurant.index+=1;
                             request.sendRequest(sender, results);
-                            apiai.apiaiProcessor(sender, "The location is traced from get location " + address + ' full confirmation, no action');
                             actions.setLastAction(sender, 'restaurantsShowing', null, []);
                         }
                         else {

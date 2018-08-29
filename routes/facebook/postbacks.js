@@ -62,7 +62,7 @@ module.exports.postbackProcessor = function (sender, postback) {
         });
     }
 
-    else if (postback.title === 'Pick') {
+    else if (postback.title === 'MENU') {
         console.log('Restaurant : ' + postback.payload);
         
         foodTem.genFoodByRestaurant(postback.payload, function (err, results) {

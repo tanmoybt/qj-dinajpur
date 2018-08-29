@@ -56,7 +56,7 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     else if(action === 'setOrderShowOnRegionRestaurants'){
         let messageData = {text: "I'm loading restaurants in "+ parameters.region + " for you..."};
         request.sendRequestcall(sender, messageData, function () {
-            resTem.genRestaurantByRegion(parameters.region, 0, function (err, results) {
+            resTem.genRestaurantByRegionGeneric(parameters.region, 0, function (err, results) {
                 if (err) throw err;
                 else {
                     if (results.attachment.payload.elements.length > 1) {
