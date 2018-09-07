@@ -1,6 +1,6 @@
 const request = require('request');
 
-const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAA385K4sEF2ruqA7jouegw2TgwSSEUhjLvvRpvlYVyrieMrJHtRUQju88GBNIwlZAwfM1Dcth4tAOCJt2EjnvCpX7C21PZCZAZBZCQ01lxXP8J0cPyysEWK4xK5HNfPnFl3jtoZBiWNgvrO1O7RhPNYmsDB3cwlgZDZD';
+const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAIsqPdoRxn8WumndMZBUFCuvvUguFUPS0V9LL7A13SbqCPzWbP77weIJhW9W9X6pXn6TmfaHaJhVRlFGcqo087hjxBXYPVfWSP0lg1RsO6jk4PCMZCxUZC9vd8zgdkLgGwY8racKtv3WB4yZA0KSgAEArXhqYAZDZD';
 
 module.exports.sendRequest = function(sender, messageData) {
     request({

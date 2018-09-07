@@ -67,5 +67,5 @@ app.get('/', (req, res) => {
 const port = process.env.PORT || 5000;
 
 app.listen(port);
-console.log(`Quijinn listening on ${port}`);
+console.log(`Foodbot listening on ${port}`);
 

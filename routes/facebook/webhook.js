@@ -21,7 +21,7 @@ let data = [];
 
 /* Handling all messenges */
 Router.post('/', (req, res) => {
-    // console.log(JSON.stringify(req, null, 2));
+    
     if (req.body.object === 'page') {
         req.body.entry.forEach((entry) => {
             entry.messaging.forEach((event) => {
