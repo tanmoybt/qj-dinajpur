@@ -22,8 +22,8 @@ mongoose.connect('mongodb://tanmoy12:asdfgh123456@ds241530.mlab.com:41530/qjdj',
         // });
     })
     .catch(err => { // if error we will be here
-        console.error('App starting error:', err.stack);
-        process.exit(1);
+        console.error('DB not connected');
+        // process.exit(1);
     });
 
 

@@ -18,6 +18,18 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         })
     }
 
+    else if(action === 'setOrderGetLocation'){
+        pipeline.setSenderData(sender);
+        pipeline.data[sender].whattodo= 'ORDER';
+        setLastAction(sender, action, speech, parameters);
+        genLoc.genGetLocation(function(err, messageData){
+            if(!err){
+                request.sendRequest(sender, messageData);
+            }
+        });
+
+    }
+
     else if(action === 'restartBotConfirm'){
         pipeline.resetSenderData(sender);
         let messageData = {text : 'Bot has restarted, your order information is removed'};
@@ -39,18 +51,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                 request.sendRequest(sender, genWhat.genWhatToDo());
             })
         }
-    }
-
-    else if(action === 'setOrderGetLocation'){
-        pipeline.setSenderData(sender);
-        pipeline.data[sender].whattodo= 'ORDER';
-        setLastAction(sender, action, speech, parameters);
-        genLoc.genGetLocation(function(err, messageData){
-            if(!err){
-                request.sendRequest(sender, messageData);
-            }
-        });
-
     }
 
     else if(action === 'setOrderShowOnRegionRestaurants'){
@@ -283,6 +283,9 @@ function sendPrevAction(sender){
             }
             else if(action === 'getPhoneNumber'){
                 request.sendRequest(sender, {text: speech});
+            }
+            else if(action == 'doNothing'){
+                
             }
         }
         else {

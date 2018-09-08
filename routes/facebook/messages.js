@@ -17,6 +17,7 @@ module.exports.messagesProcessor = function (sender, message) {
             provider: 'google',
             apiKey: 'AIzaSyBeMeLnG6dPdAmOnhNeIyBZhYgsY9HGGbw'
         };
+        console.log('location : ' + JSON.stringify(message.attachments[0], null, 2));
         const geocoder = NodeGeocoder(options);
         let lat = message.attachments[0].payload.coordinates.lat;
         let lng = message.attachments[0].payload.coordinates.long;
@@ -64,7 +65,16 @@ module.exports.messagesProcessor = function (sender, message) {
     else if (message.quick_reply) {
         console.log('quick reply :' + message.quick_reply.payload);
         if (message.quick_reply.payload === 'ORDER_FOOD') {
-            apiai.apiaiProcessor(sender, message.quick_reply.payload);
+            pipeline.setSenderData(sender);
+            pipeline.data[sender].whattodo= 'ORDER';
+
+            actions.setLastAction(sender, "setOrderGetLocation", null, null);
+
+            genLoc.genGetLocation(function(err, messageData){
+                if(!err){
+                    request.sendRequest(sender, messageData);
+                }
+            });
         }
         else if(message.quick_reply.payload === 'GET_ORDER'){
             request.sendRequest(sender, {text: 'done'});
@@ -86,7 +96,7 @@ module.exports.messagesProcessor = function (sender, message) {
 
 function locationProcessor(sender, address, zipcode, region) {
     if(!address && region && zipcode){
-        let messageData = {text: "I'm loading restaurants from "+ region + " for you..."};
+        let messageData = {text: "I'm looking for restaurants in "+ region + " for you... 🛎"};
         request.sendRequestcall(sender, messageData, function () {
             resTem.genRestaurantByRegionGeneric(region, 0, function (err, results) {
                 if (err) throw err;
@@ -100,10 +110,10 @@ function locationProcessor(sender, address, zipcode, region) {
                         };
                         pipeline.data[sender].restaurant.index+=1;
                         request.sendRequest(sender, results);
-                        actions.setLastAction(sender, 'restaurantsShowing', null, []);
+                        actions.setLastAction(sender, 'doNothing', null, []);
                     }
                     else {
-                        messageData = {text: "Sorry, delivery in this area is currently off."};
+                        messageData = {text: "Sorry, delivery in this area is currently off. 🛎"};
                         request.sendRequestcall(sender, messageData, function () {
                             genLoc.genGetRegion(function(err, messageData){
                                 if(!err){
@@ -117,7 +127,7 @@ function locationProcessor(sender, address, zipcode, region) {
         })
     }
     else if(address && zipcode && region){
-        let messageData = {text: 'your location is ' + address};
+        let messageData = {text: 'your location is ' + address + '🎪'};
         request.sendRequestcall(sender, messageData, function () {
             messageData = {text: "I'm loading restaurants for you..."};
             request.sendRequestcall(sender, messageData, function () {
@@ -152,9 +162,9 @@ function locationProcessor(sender, address, zipcode, region) {
         })
     }
     else if(address && region){
-        let messageData = {text: 'your location is ' + address};
+        let messageData = {text: 'your location is ' + address + '🎪'};
         request.sendRequestcall(sender, messageData, function () {
-            messageData = {text: "I'm loading restaurants for you..."};
+            messageData = {text: "I'm looking for restaurants for you... 😋🍦"};
             request.sendRequestcall(sender, messageData, function () {
                 resTem.genRestaurantByRegionGeneric(region,0, function (err, results) {
                     if (err) throw err;
@@ -171,7 +181,7 @@ function locationProcessor(sender, address, zipcode, region) {
                             actions.setLastAction(sender, 'restaurantsShowing', null, []);
                         }
                         else {
-                            messageData = {text: "Sorry, I could not find restaurants in this area. You could choose a region"};
+                            messageData = {text: "Sorry 🙁, I could not find restaurants in this area 😔"};
                             request.sendRequestcall(sender, messageData, function () {
                                 genLoc.genGetRegion(function(err, messageData){
                                     if(!err){
@@ -191,7 +201,7 @@ function locationProcessor(sender, address, zipcode, region) {
             confirmed: true,
             value: true
         };
-        let messageData = {text: "Sorry, I could not find restaurants in this area. You could choose a region"};
+        let messageData = {text: "Sorry 🙁, I could not find restaurants in this area 😔"};
         request.sendRequestcall(sender, messageData, function () {
             request.sendRequest(sender, genLoc.genGetRegion());
         });

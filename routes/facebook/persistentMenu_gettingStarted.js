@@ -119,4 +119,5 @@ curl -X POST -H "Content-Type: application/json" -d '{
 curl -X POST -H "Content-Type: application/json" -d '{
   "get_started":{
     "payload":"GET_STARTED_PAYLOAD"
+  }
 }' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=EAAZAgcMnsu28BAIsqPdoRxn8WumndMZBUFCuvvUguFUPS0V9LL7A13SbqCPzWbP77weIJhW9W9X6pXn6TmfaHaJhVRlFGcqo087hjxBXYPVfWSP0lg1RsO6jk4PCMZCxUZC9vd8zgdkLgGwY8racKtv3WB4yZA0KSgAEArXhqYAZDZD" 
