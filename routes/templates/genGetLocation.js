@@ -10,7 +10,7 @@ module.exports.genGetLocation = function (callback) {
         replies.push(location_reply);
 
         let res = {
-                "text": "Please select a region to find restaurants in",
+                "text": "Please select a region to find restaurants in... 🍴🍕🍔",
                 "quick_replies": replies
             };
 
@@ -21,7 +21,7 @@ module.exports.genGetLocation = function (callback) {
             replies = makeTemplate(regions);
             replies.unshift(location_reply);
             res = {
-                "text": "Please select a region to find restaurants in",
+                "text": "Please select a region to find restaurants in... 🍴🍕🍔",
                 "quick_replies": replies
             };
             console.log(res);
@@ -31,6 +31,36 @@ module.exports.genGetLocation = function (callback) {
     });
 
 };
+
+module.exports.getRegionsOnLatLong = function(lat, long, cb) {
+    Regions.aggregate([
+       {
+         $project: { 
+             delta: {
+                 $add: [
+                     {$abs: { 
+                         $subtract: [ "$lat", lat ] 
+                     }}, 
+                     {$abs: {
+                         $subtract: [ "$long", long ]    
+                     }}
+                 ]
+             }, 
+             name: "$name" ,
+          }
+       },
+       {
+           $match : {
+                delta: { $lt: 0.06 }
+           }
+       }
+    ], function(err, regions){
+        if(err) cb(err, null)
+        else {
+            cb(null, regions);
+        }
+    })
+}
 
 module.exports.genGetRegion = function (cb) {
     Regions.find(function (err, regions) {
@@ -42,7 +72,7 @@ module.exports.genGetRegion = function (cb) {
         else{
             replies = makeTemplate(regions);
             res = {
-                "text": "Please select a region to find restaurants in",
+                "text": "Please select a region to find restaurants in... 🍴🍕🍔",
                 "quick_replies": replies
             };
 
@@ -70,7 +100,7 @@ function makeTemplate(regions) {
                 {
                     "content_type": "text",
                     "title": region.name,
-                    "payload": "REGION_" + region.name + "_" + region.zip_code
+                    "payload": "REGION_" + region.name
                 }
             )
         });

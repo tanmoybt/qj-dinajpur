@@ -13,62 +13,75 @@ const actions= require('./actions');
 
 module.exports.messagesProcessor = function (sender, message) {
     if (message.attachments && message.attachments[0].type === 'location') {
-        let options = {
-            provider: 'google',
-            apiKey: 'AIzaSyBeMeLnG6dPdAmOnhNeIyBZhYgsY9HGGbw'
-        };
-        console.log('location : ' + JSON.stringify(message.attachments[0], null, 2));
-        const geocoder = NodeGeocoder(options);
+        
         let lat = message.attachments[0].payload.coordinates.lat;
         let lng = message.attachments[0].payload.coordinates.long;
 
-        if (!pipeline.data[sender].location.address && pipeline.data[sender].foods.length===0) {
+        if(message.attachments[0].title.includes("'s Location")){
+            // vague location
+            let options = {
+                provider: 'google',
+                apiKey: 'AIzaSyBeMeLnG6dPdAmOnhNeIyBZhYgsY9HGGbw'
+            };
 
-            console.log(lat + ' ' + lng);
+            const geocoder = NodeGeocoder(options);
 
-            geocoder.reverse({lat: lat, lon: lng},
-                function (err, res) {
-                    if (err) {
-                        console.log(err);
-                        return;
+            let messageData;
+            geocoder.reverse({lat: lat, lon: lng}, function (err, res) {
+                if (err) { console.log(err); return; }
+
+                console.log(res);
+                console.log(res[0].formattedAddress);
+                pipeline.setSenderData(sender);
+                pipeline.data[sender].location = {address: message.attachments[0].title, value: true};
+
+                let messageData = {text: 'your location is ' + res[0].formattedAddress + '🎪'};
+
+                request.sendRequestcall(sender, messageData, function() {
+                    if(pipeline.data[sender].shortContext === 'region') {
+                    // context menu
+                    showRestaurants(sender, 'latlong', lat, lng, null)
+
                     }
-                    console.log(res);
-                    console.log(res[0].formattedAddress);
-                    console.log(res[0].zipcode);
-                    locationProcessor(sender, res[0].formattedAddress, res[0].zipcode, res[0].extra.neighborhood);
+                    else if (pipeline.data[sender].shortContext === 'cart') {
+                        // context cart
+                    }
                 });
+                
+            });
+
+            
         }
-        else if(!pipeline.data[sender].location.address && pipeline.data[sender].foods.length>0){
-            console.log(lat + ' ' + lng);
+        else{
+            // exact location
+            pipeline.setSenderData(sender);
+            pipeline.data[sender].location = {address: message.attachments[0].title, value: true};
 
-            geocoder.reverse({lat: lat, lon: lng},
-                function (err, res) {
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
-                    console.log(res);
-                    console.log(res[0].formattedAddress);
-                    console.log(res[0].zipcode);
-                    pipeline.data[sender].location.address = res[0].formattedAddress;
-                    let messageData= {text: 'The location is traced from get location ' + res[0].formattedAddress + ', full confirmation, no action'};
-                    apiai.apiaiProcessor(sender, messageData.text);
-                    messageData= {text: 'Your address is ' + res[0].formattedAddress};
-                    request.sendRequestcall(sender, messageData, function () {
-                        request.sendRequest(sender, {text: "Give me a phone number to find you and we'll be done"});
-                    });
+            let messageData = {text: 'your location is ' + message.attachments[0].title + '🎪'};
 
-                });
+            request.sendRequestcall(sender, messageData, function() {
+                if(pipeline.data[sender].shortContext === 'region') {
+                    // context menu
+                    showRestaurants(sender, 'latlong', lat, lng, null)
+
+                }
+                else if (pipeline.data[sender].shortContext === 'cart') {
+                    // context cart
+                }
+            });
+            
         }
     }
 
     else if (message.quick_reply) {
         console.log('quick reply :' + message.quick_reply.payload);
         if (message.quick_reply.payload === 'ORDER_FOOD') {
+
             pipeline.setSenderData(sender);
             pipeline.data[sender].whattodo= 'ORDER';
+            pipeline.data[sender].shortContext= 'region';
 
-            actions.setLastAction(sender, "setOrderGetLocation", null, null);
+            actions.setLastAction(sender, "showLocationOnOrder", null, null);
 
             genLoc.genGetLocation(function(err, messageData){
                 if(!err){
@@ -82,7 +95,7 @@ module.exports.messagesProcessor = function (sender, message) {
         else {
             let res = message.quick_reply.payload.split("_");
             if(res[0]=== 'REGION'){
-                locationProcessor(sender, null, res[2], res[1]);
+                showRestaurants(sender, 'region', null, null, res[1])
             }
         }
     }
@@ -94,116 +107,62 @@ module.exports.messagesProcessor = function (sender, message) {
     }
 };
 
-function locationProcessor(sender, address, zipcode, region) {
-    if(!address && region && zipcode){
-        let messageData = {text: "I'm looking for restaurants in "+ region + " for you... 🛎"};
+function showRestaurants(sender, mode, lat, long, region) {
+    console.log(mode, region);
+    if(mode === 'latlong'){
+        genLoc.getRegionsOnLatLong(parseFloat(lat), parseFloat(long), function (err, results) {
+            if (err) throw err;
+            else {
+                if (results.length) {
+                    console.log(results)
+                    let finalRegions = [] ;
+                    for(let i=0;i<results.length;i++){
+                        finalRegions.push(results[i].name);
+                    }
+                    let messageData = {text: "I'm looking for restaurants for you... 😋🍦"};
+                    request.sendRequestcall(sender, messageData, function () {
+                        resTem.genRestaurantByRegionsGeneric(finalRegions, 0, function (err, results) {
+                            if (err) throw err;
+                            else {
+                                if (results.attachment.payload.elements.length > 1) {
+                                    
+                                    pipeline.data[sender].restaurant.index+=1;
+                                    request.sendRequest(sender, results);
+
+                                }
+                            }
+                        });
+                        
+                    }) 
+                }
+                else {
+                    messageData = {text: "Sorry 🙁, delivery in this area is currently off. 🛎"};
+                    request.sendRequestcall(sender, messageData, function () {
+                        genLoc.genGetRegion(function(err, messageData){
+                            if(!err){
+                                request.sendRequest(sender, messageData);
+                            }
+                        });
+                    });
+                }
+            }
+        })
+    }
+    else if(mode === 'region'){
+        let messageData = {text: "I'm looking for restaurants for you... 😋🍦"};
         request.sendRequestcall(sender, messageData, function () {
             resTem.genRestaurantByRegionGeneric(region, 0, function (err, results) {
                 if (err) throw err;
                 else {
                     if (results.attachment.payload.elements.length > 1) {
-                        pipeline.data[sender].location = {
-                            zip: zipcode,
-                            region: region,
-                            confirmed: false,
-                            value: true
-                        };
+                        
                         pipeline.data[sender].restaurant.index+=1;
                         request.sendRequest(sender, results);
-                        actions.setLastAction(sender, 'doNothing', null, []);
-                    }
-                    else {
-                        messageData = {text: "Sorry, delivery in this area is currently off. 🛎"};
-                        request.sendRequestcall(sender, messageData, function () {
-                            genLoc.genGetRegion(function(err, messageData){
-                                if(!err){
-                                    request.sendRequest(sender, messageData);
-                                }
-                            });
-                        });
+
                     }
                 }
             });
         })
-    }
-    else if(address && zipcode && region){
-        let messageData = {text: 'your location is ' + address + '🎪'};
-        request.sendRequestcall(sender, messageData, function () {
-            messageData = {text: "I'm loading restaurants for you..."};
-            request.sendRequestcall(sender, messageData, function () {
-                resTem.genRestaurantByZip('1111',0, function (err, results) {
-                    if (err) throw err;
-                    else {
-                        if (results.attachment.payload.elements.length > 1) {
-                            pipeline.data[sender].location = {
-                                address: address,
-                                zip: zipcode,
-                                region: region,
-                                confirmed: false,
-                                value: true
-                            };
-                            pipeline.data[sender].restaurant.index+=1;
-                            request.sendRequest(sender, results);
-                            actions.setLastAction(sender, 'restaurantsShowing', null, []);
-                        }
-                        else {
-                            messageData = {text: "Sorry, I could not find restaurants in this area. You could choose a region"};
-                            request.sendRequestcall(sender, messageData, function () {
-                                genLoc.genGetRegion(function(err, messageData){
-                                if(!err){
-                                    request.sendRequest(sender, messageData);
-                                }
-                            });
-                            });
-                        }
-                    }
-                });
-            })
-        })
-    }
-    else if(address && region){
-        let messageData = {text: 'your location is ' + address + '🎪'};
-        request.sendRequestcall(sender, messageData, function () {
-            messageData = {text: "I'm looking for restaurants for you... 😋🍦"};
-            request.sendRequestcall(sender, messageData, function () {
-                resTem.genRestaurantByRegionGeneric(region,0, function (err, results) {
-                    if (err) throw err;
-                    else {
-                        if (results.attachment.payload.elements.length > 1) {
-                            pipeline.data[sender].location = {
-                                address: address,
-                                region: region,
-                                confirmed: false,
-                                value: true
-                            };
-                            pipeline.data[sender].restaurant.index+=1;
-                            request.sendRequest(sender, results);
-                            actions.setLastAction(sender, 'restaurantsShowing', null, []);
-                        }
-                        else {
-                            messageData = {text: "Sorry 🙁, I could not find restaurants in this area 😔"};
-                            request.sendRequestcall(sender, messageData, function () {
-                                genLoc.genGetRegion(function(err, messageData){
-                                    if(!err){
-                                        request.sendRequest(sender, messageData);
-                                    }
-                                });
-                            });
-                        }
-                    }
-                });
-            })
-        })
-    }
-    else if(address){
-        pipeline.data[sender].location = {
-            address: address,
-            confirmed: true,
-            value: true
-        };
-        let messageData = {text: "Sorry 🙁, I could not find restaurants in this area 😔"};
-        request.sendRequestcall(sender, messageData, function () {
-            request.sendRequest(sender, genLoc.genGetRegion());
-        });
-    }
+    } 
 }
+

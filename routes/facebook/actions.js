@@ -18,7 +18,7 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         })
     }
 
-    else if(action === 'setOrderGetLocation'){
+    else if(action === 'showLocationOnOrder'){
         pipeline.setSenderData(sender);
         pipeline.data[sender].whattodo= 'ORDER';
         setLastAction(sender, action, speech, parameters);
@@ -271,7 +271,7 @@ function sendPrevAction(sender){
             let speech = pipeline.data[sender].lastactiontaken.speech;
             let parameters = pipeline.data[sender].lastactiontaken.parameters;
 
-            if(action === 'setOrderGetLocation'){
+            if(action === 'showLocationOnOrder'){
                 genLoc.genGetLocation(function(err, messageData){
                     if(!err){
                         request.sendRequest(sender, messageData);

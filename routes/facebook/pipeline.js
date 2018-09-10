@@ -6,6 +6,8 @@ module.exports.setSenderData = function (sender) {
     if (!data[sender]) {
         data[sender] =
             {
+                context: 'menu',
+                shortContext: '',
                 whattodo: '',
                 name : '',
                 lastactiontaken: {
@@ -31,6 +33,8 @@ module.exports.setSenderData = function (sender) {
 module.exports.resetSenderData = function (sender) {
     data[sender] =
         {
+            context: 'menu',
+            shortContext: '',
             whattodo: '',
             lastactiontaken: {
                 action:'', speech:'', parameters: []
@@ -63,6 +67,8 @@ module.exports.clearSenderData = function (sender) {
     else {
         data[sender] =
         {
+            context: 'menu',
+            shortContext: '',
             whattodo: '',
             lastactiontaken: {
                 action:'', speech:'', parameters: []

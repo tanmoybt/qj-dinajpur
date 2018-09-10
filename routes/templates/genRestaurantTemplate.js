@@ -31,6 +31,20 @@ module.exports.genRestaurantByRegionGeneric = function (region, index, callback)
     });
 }
 
+module.exports.genRestaurantByRegionsGeneric = function (regions, index, callback) {
+    let perPage = 10;
+    let page = index + 1;
+    Restaurant.paginate({region : { "$in" : regions}}, { page: page, limit: perPage }, function(err, result) {
+        console.log(result.total);
+        if(result.total > (page)*perPage){
+            callback(err, makeTemplateGeneric(result.docs, true));
+        }
+        else {
+            callback(err, makeTemplateGeneric(result.docs, false));
+        }
+    });
+}
+
 module.exports.genRestaurantByZip = function (zip, index, callback) {
     let perPage = 4;
     let page = index+1;
