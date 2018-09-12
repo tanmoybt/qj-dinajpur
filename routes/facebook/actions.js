@@ -84,6 +84,41 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         })
     }
 
+    else if(action === 'showRestaurantsOnCuisine'){
+        let messageData = {text: "I'm loading " + parameters.cuisine + " restaurants for you..."};
+        request.sendRequestcall(sender, messageData, function () {
+            resTem.genRestaurantByCuisine(parameters.cuisine,0, function (err, results) {
+                if (err) throw err;
+                else {
+                    if (results.attachment.payload.elements.length > 1) {
+                        pipeline.data[sender].restaurant.index+=1;
+                        request.sendRequest(sender, results);
+                        setLastAction(sender, 'none', null, []);
+                    }
+                    else {
+                        messageData = {text: "Sorry, I could not find "+ parameters.cuisine+ " restaurants"};
+                        request.sendRequestcall(sender, messageData, function () {
+                            
+                            genLoc.genGetRegion(function(err, messageData){
+                                if(!err){
+                                    request.sendRequest(sender, messageData);
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+        })
+    }
+
+    else if(action === 'showRestaurantsOnRegion'){
+        
+    }
+
+    else if(action === 'showLocationOnOrder'){
+        
+    }
+
     else if(action === 'showMenuOnRestaurant'){
         setLastAction(sender, 'none', '', []);
         console.log(parameters.restaurant_name);
@@ -115,39 +150,32 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         });
     }
 
-    else if(action === 'showRestaurantsOnCuisine'){
-        let messageData = {text: "I'm loading " + parameters.cuisine + " restaurants for you..."};
-        request.sendRequestcall(sender, messageData, function () {
-            resTem.genRestaurantByCuisine(parameters.cuisine,0, function (err, results) {
-                if (err) throw err;
-                else {
-                    if (results.attachment.payload.elements.length > 1) {
-                        pipeline.data[sender].restaurant.index+=1;
-                        request.sendRequest(sender, results);
-                        setLastAction(sender, 'none', null, []);
-                    }
-                    else {
-                        messageData = {text: "Sorry, I could not find "+ parameters.cuisine+ " restaurants"};
-                        request.sendRequestcall(sender, messageData, function () {
-                            
-                            genLoc.genGetRegion(function(err, messageData){
-                                if(!err){
-                                    request.sendRequest(sender, messageData);
-                                }
-                            });
-                        });
-                    }
-                }
-            });
-        })
-    }
-
-    else if(action === 'getFoodOnFood'){
+    else if(action === 'showFoodsOnFoods'){
         const input = parameters.food_name;  // the input from your auto-complete box
 
         foodTem.genFoodByFood(input, function (err, result) {
             request.sendRequest(sender, result);
         })
+    }
+
+    else if(action === 'showFoodsOnAmountFoods'){
+        
+    }
+
+    else if(action === 'showFoodsOnAmountIngredientFoods'){
+        
+    }
+
+    else if(action === 'showFoodsOnFoodsRestaurants'){
+        
+    }
+
+    else if(action === 'showFoodsOnAmountFoodsRestaurant'){
+        
+    }
+
+    else if(action === 'showFoodsOnAmountIngredientFoodsRestaurant'){
+        
     }
 
     else if(action === 'addFoodGetQuantity'){
