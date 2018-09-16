@@ -11,6 +11,8 @@ const apiai = require('./apiai');
 module.exports.actionsProcessor= function (sender, action, speech, parameters, resolvedQuery) {
     pipeline.setSenderData(sender);
 
+    console.log(action);
+
     if(action.includes('smalltalk') || action === 'input.unknown' || action === 'input.welcome'){
         let messageData = {text: speech};
         request.sendRequestcall(sender, messageData, function () {
@@ -19,7 +21,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     }
 
     else if(action === 'showLocationOnOrder'){
-        pipeline.setSenderData(sender);
         pipeline.data[sender].whattodo= 'ORDER';
         setLastAction(sender, action, speech, parameters);
         genLoc.genGetLocation(function(err, messageData){
@@ -30,47 +31,59 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
 
     }
 
-    else if(action === 'restartBotConfirm'){
-        pipeline.resetSenderData(sender);
-        let messageData = {text : 'Bot has restarted, your order information is removed'};
-        request.sendRequestcall(sender, messageData, function () {
-            apiai.apiResetContext(sender);
-            request.sendRequest(sender, genWhat.genWhatToDo())
-        });
-    }
-
-    else if(action === 'restartBot'){
-        if(pipeline.data[sender]){
-            let messageData= {text: speech};
-            request.sendRequest(sender, messageData);
-        }
-        else {
-            let messageData= {text : 'Bot has restarted, your order information is removed'};
+    else if(action === 'showRestaurantsOnCuisine'){
+        if(pipeline.data[sender].location.regions.length){
+            console.log(parameters);
+            let messageData = {text: "I'm loading " + parameters.cuisine + " restaurants for you...🎪"};
             request.sendRequestcall(sender, messageData, function () {
-                apiai.apiResetContext(sender);
-                request.sendRequest(sender, genWhat.genWhatToDo());
+                resTem.genRestaurantByCuisines(parameters.cuisine, 0 , function (err, results) {
+                    if (err) throw err;
+                    else {
+                        if (results.attachment) {
+
+                            request.sendRequest(sender, results);
+                            
+                            setLastAction(sender, 'doNothing', null, []);
+                        }
+                        else {
+                            messageData = {text: "Sorry, I could not find "+ parameters.cuisine+ " restaurants"};
+                            request.sendRequestcall(sender, messageData, function () {
+                                
+                                genLoc.genGetRegion(function(err, messageData){
+                                    if(!err){
+                                        request.sendRequest(sender, messageData);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
             })
         }
+        else {
+            genLoc.genGetLocation(function(err, messageData){
+                if(!err){
+                    request.sendRequest(sender, messageData);
+                }
+            });
+        }
     }
 
-    else if(action === 'setOrderShowOnRegionRestaurants'){
+    else if(action === 'showRestaurantsOnRegion'){
         let messageData = {text: "I'm loading restaurants in "+ parameters.region + " for you..."};
         request.sendRequestcall(sender, messageData, function () {
             resTem.genRestaurantByRegionGeneric(parameters.region, 0, function (err, results) {
                 if (err) throw err;
                 else {
-                    if (results.attachment.payload.elements.length > 1) {
-                        pipeline.data[sender].location = {
-                            region: parameters.region,
-                            confirmed: false,
-                            value: true
-                        };
-                        pipeline.data[sender].restaurant.index+=1;
+                    if (results.attachment.payload) {
+                        
+                        pipeline.data[sender].location.regions.push(res[1]);
+
                         request.sendRequest(sender, results);
-                        setLastAction(sender, 'none', null, []);
+                        setLastAction(sender, 'doNothing', null, []);
                     }
                     else {
-                        messageData = {text: "Sorry, I could not find"+ parameters.cuisine+ "restaurants"};
+                        messageData = {text: "Sorry, I could not find restaurants in "+ parameters.region + "🙁"};
                         request.sendRequestcall(sender, messageData, function () {
                             genLoc.genGetRegion(function(err, messageData){
                                 if(!err){
@@ -81,46 +94,11 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                     }
                 }
             });
-        })
-    }
-
-    else if(action === 'showRestaurantsOnCuisine'){
-        let messageData = {text: "I'm loading " + parameters.cuisine + " restaurants for you..."};
-        request.sendRequestcall(sender, messageData, function () {
-            resTem.genRestaurantByCuisine(parameters.cuisine,0, function (err, results) {
-                if (err) throw err;
-                else {
-                    if (results.attachment.payload.elements.length > 1) {
-                        pipeline.data[sender].restaurant.index+=1;
-                        request.sendRequest(sender, results);
-                        setLastAction(sender, 'none', null, []);
-                    }
-                    else {
-                        messageData = {text: "Sorry, I could not find "+ parameters.cuisine+ " restaurants"};
-                        request.sendRequestcall(sender, messageData, function () {
-                            
-                            genLoc.genGetRegion(function(err, messageData){
-                                if(!err){
-                                    request.sendRequest(sender, messageData);
-                                }
-                            });
-                        });
-                    }
-                }
-            });
-        })
-    }
-
-    else if(action === 'showRestaurantsOnRegion'){
-        
-    }
-
-    else if(action === 'showLocationOnOrder'){
-        
+        });
     }
 
     else if(action === 'showMenuOnRestaurant'){
-        setLastAction(sender, 'none', '', []);
+        setLastAction(sender, 'doNothing', null, []);
         console.log(parameters.restaurant_name);
 
         foodTem.genFoodByRestaurant(parameters.restaurant_name, function (err, results) {
@@ -151,11 +129,79 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     }
 
     else if(action === 'showFoodsOnFoods'){
-        const input = parameters.food_name;  // the input from your auto-complete box
+        if(pipeline.data[sender].location.regions.length){
+            console.log(parameters);
+            let messageData = {text: "I'm looking for " + parameters.food_tag[0] + " for you...😋🍦"};
+            request.sendRequestcall(sender, messageData, function () {
+                foodTem.genFoodsByFoods(parameters.food_tag, 0 , function (err, results) {
+                    if (err) throw err;
+                    else {
+                        if (results.attachment) {
 
-        foodTem.genFoodByFood(input, function (err, result) {
-            request.sendRequest(sender, result);
-        })
+                            request.sendRequest(sender, results);
+                            
+                            setLastAction(sender, 'doNothing', null, []);
+                        }
+                        else {
+                            messageData = {text: "Sorry 🙁, I could not find any "+ parameters.food_tag[0] + " for you "};
+                            request.sendRequestcall(sender, messageData, function () {
+                                
+                                genLoc.genGetRegion(function(err, messageData){
+                                    if(!err){
+                                        request.sendRequest(sender, messageData);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
+            })
+        }
+        else {
+            genLoc.genGetLocation(function(err, messageData){
+                if(!err){
+                    request.sendRequest(sender, messageData);
+                }
+            });
+        }
+    }
+
+    else if(action === "showFoodsOnIngredientFood"){
+        if(pipeline.data[sender].location.regions.length){
+            console.log(parameters);
+            let messageData = {text: "I'm looking for " + parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you...😋🍦"};
+            request.sendRequestcall(sender, messageData, function () {
+                foodTem.genFoodsByIngredientFood(parameters.ingredient_food[0], 0 , function (err, results) {
+                    if (err) throw err;
+                    else {
+                        if (results.attachment) {
+
+                            request.sendRequest(sender, results);
+                            
+                            setLastAction(sender, 'doNothing', null, []);
+                        }
+                        else {
+                            messageData = {text: "Sorry 🙁, I could not find any "+ parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you "};
+                            request.sendRequestcall(sender, messageData, function () {
+                                
+                                genLoc.genGetRegion(function(err, messageData){
+                                    if(!err){
+                                        request.sendRequest(sender, messageData);
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
+            })
+        }
+        else {
+            genLoc.genGetLocation(function(err, messageData){
+                if(!err){
+                    request.sendRequest(sender, messageData);
+                }
+            });
+        }
     }
 
     else if(action === 'showFoodsOnAmountFoods'){
@@ -322,6 +368,7 @@ function sendPrevAction(sender){
         }
     }
     else{
+
         apiai.apiResetContext(sender);
         request.sendRequest(sender,genWhat.genWhatToDo());
     }

@@ -12,6 +12,8 @@ const actions= require('./actions');
 
 
 module.exports.messagesProcessor = function (sender, message) {
+    pipeline.setSenderData(sender);
+
     if (message.attachments && message.attachments[0].type === 'location') {
         
         let lat = message.attachments[0].payload.coordinates.lat;
@@ -32,19 +34,26 @@ module.exports.messagesProcessor = function (sender, message) {
 
                 console.log(res);
                 console.log(res[0].formattedAddress);
-                pipeline.setSenderData(sender);
+                
                 pipeline.data[sender].location = {address: message.attachments[0].title, value: true};
 
                 let messageData = {text: 'your location is ' + res[0].formattedAddress + '🎪'};
+                pipeline.data[sender].location.address = res[0].formattedAddress;
+                pipeline.data[sender].address.address = res[0].formattedAddress;
 
                 request.sendRequestcall(sender, messageData, function() {
                     if(pipeline.data[sender].shortContext === 'region') {
-                    // context menu
-                    showRestaurants(sender, 'latlong', lat, lng, null)
+                        // context menu
+                        console.log("context region");
+                        showRestaurants(sender, 'latlong', lat, lng, null)
 
                     }
                     else if (pipeline.data[sender].shortContext === 'cart') {
                         // context cart
+                    }
+                    else {
+                        console.log("context none");
+                        showRestaurants(sender, 'latlong', lat, lng, null)
                     }
                 });
                 
@@ -54,10 +63,11 @@ module.exports.messagesProcessor = function (sender, message) {
         }
         else{
             // exact location
-            pipeline.setSenderData(sender);
-            pipeline.data[sender].location = {address: message.attachments[0].title, value: true};
 
             let messageData = {text: 'your location is ' + message.attachments[0].title + '🎪'};
+
+            pipeline.data[sender].location.address = message.attachments[0].title;
+            pipeline.data[sender].address.address = message.attachments[0].title;
 
             request.sendRequestcall(sender, messageData, function() {
                 if(pipeline.data[sender].shortContext === 'region') {
@@ -77,7 +87,6 @@ module.exports.messagesProcessor = function (sender, message) {
         console.log('quick reply :' + message.quick_reply.payload);
         if (message.quick_reply.payload === 'ORDER_FOOD') {
 
-            pipeline.setSenderData(sender);
             pipeline.data[sender].whattodo= 'ORDER';
             pipeline.data[sender].shortContext= 'region';
 
@@ -95,6 +104,7 @@ module.exports.messagesProcessor = function (sender, message) {
         else {
             let res = message.quick_reply.payload.split("_");
             if(res[0]=== 'REGION'){
+                pipeline.data[sender].location.regions.push(res[1]);
                 showRestaurants(sender, 'region', null, null, res[1])
             }
         }
@@ -111,20 +121,21 @@ function showRestaurants(sender, mode, lat, long, region) {
     console.log(mode, region);
     if(mode === 'latlong'){
         genLoc.getRegionsOnLatLong(parseFloat(lat), parseFloat(long), function (err, results) {
-            if (err) throw err;
+            if (err) console.log("gen region on latlong err", err);
             else {
                 if (results.length) {
                     console.log(results)
                     let finalRegions = [] ;
                     for(let i=0;i<results.length;i++){
+                        pipeline.data[sender].location.regions.push(results[i].name);
                         finalRegions.push(results[i].name);
                     }
                     let messageData = {text: "I'm looking for restaurants for you... 😋🍦"};
                     request.sendRequestcall(sender, messageData, function () {
                         resTem.genRestaurantByRegionsGeneric(finalRegions, 0, function (err, results) {
-                            if (err) throw err;
+                            if (err) console.log("gen res by regions err", err);
                             else {
-                                if (results.attachment.payload.elements.length > 1) {
+                                if (results.attachment.payload.elements.length > 0) {
                                     
                                     pipeline.data[sender].restaurant.index+=1;
                                     request.sendRequest(sender, results);
@@ -154,7 +165,7 @@ function showRestaurants(sender, mode, lat, long, region) {
             resTem.genRestaurantByRegionGeneric(region, 0, function (err, results) {
                 if (err) throw err;
                 else {
-                    if (results.attachment.payload.elements.length > 1) {
+                    if (results.attachment.payload.elements.length > 0) {
                         
                         pipeline.data[sender].restaurant.index+=1;
                         request.sendRequest(sender, results);

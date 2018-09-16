@@ -14,7 +14,10 @@ module.exports.setSenderData = function (sender) {
                     action:'', speech:'', parameters: []
                 },
                 location: {
-                    address: '', zip: '', confirmed: false, value: false
+                    address: '', regions: []
+                },
+                address: {
+                    address: '', confirmed: false
                 },
                 restaurant: { index: 0,
                     res_id: '', name: '', image_url: '', confirmed: false
@@ -32,23 +35,25 @@ module.exports.setSenderData = function (sender) {
 
 module.exports.resetSenderData = function (sender) {
     data[sender] =
-        {
+         {
             context: 'menu',
             shortContext: '',
             whattodo: '',
+            name : '',
             lastactiontaken: {
                 action:'', speech:'', parameters: []
             },
-            name : '',
             location: {
-                address: '', zip: '', confirmed: false, value: false
+                address: '', regions: []
             },
-            foodattending: {},
+            address: {
+                address: '', confirmed: false
+            },
             restaurant: { index: 0,
                 res_id: '', name: '', image_url: '', confirmed: false
             },
             restaurantinline: { index: 0,
-                    res_id: '', name: '', image_url: '', confirmed: false
+                res_id: '', name: '', image_url: '', confirmed: false
             },
             foodattending: '',
             foodinline: '',
@@ -66,23 +71,25 @@ module.exports.clearSenderData = function (sender) {
     }
     else {
         data[sender] =
-        {
+         {
             context: 'menu',
             shortContext: '',
             whattodo: '',
+            name : '',
             lastactiontaken: {
                 action:'', speech:'', parameters: []
             },
-            name : '',
             location: {
-                address: '', zip: '', confirmed: false, value: false
+                address: '', regions: []
             },
-            foodattending: {},
+            address: {
+                address: '', confirmed: false
+            },
             restaurant: { index: 0,
                 res_id: '', name: '', image_url: '', confirmed: false
             },
             restaurantinline: { index: 0,
-                    res_id: '', name: '', image_url: '', confirmed: false
+                res_id: '', name: '', image_url: '', confirmed: false
             },
             foodattending: '',
             foodinline: '',

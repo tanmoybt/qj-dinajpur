@@ -41,15 +41,75 @@ module.exports.genFoodByRestaurant = function (res_name, callback) {
     })
 };
 
-module.exports.genFoodByFood = function (food_name, callback) {
+module.exports.genFoodsByFoods = function (food_tags, index, callback) {
+    
     let perPage = 10;
-    let page = 0;
-    console.log(food_name);
-    Food.find({food_name: new RegExp(food_name, "i")}, function (err, foods) {
-        if (err) return err;
-        console.log(foods.size);
-        callback(err, makeTemplate(foods));
+    let page = 1;
+
+    console.log(food_tags.length);
+
+    if(food_tags.length > 0){
+
+         Food.aggregate([
+            {
+                $match: {
+                    food_tags: food_tags[0]
+                }
+            },
+            {
+                $lookup:{
+                     from: "restaurants",
+                     localField: "res_id",
+                     foreignField: "_id",
+                     as: "restaurant"
+               }
+            },
+            {
+                $limit : 10
+            }
+        ], function(err, foods){
+            if(err) console.log(err);
+            else {
+                callback(null, makeTemplateFoods(foods));
+            }
+        })
+
+    }
+
+};
+
+module.exports.genFoodsByIngredientFood = function (ing_food, index, callback) {
+    
+    let perPage = 10;
+    let page = 1;
+
+     Food.aggregate([
+        {
+            $match: {
+                ingredient_tags: ing_food.ingredient_tag1,
+                food_tags: ing_food.food_tag1
+            }
+        },
+        {
+            $lookup:{
+                 from: "restaurants",
+                 localField: "res_id",
+                 foreignField: "_id",
+                 as: "restaurant"
+           }
+        },
+        {
+            $limit : 10
+        }
+    ], function(err, foods){
+        if(err) console.log(err);
+        else {
+            console.log(foods);
+            callback(null, makeTemplateFoods(foods));
+        }
     })
+
+    
 
 };
 
@@ -120,12 +180,6 @@ function makeTemplate(foods) {
                     "title": food.food_name,
                     "subtitle": food.cuisine + ', Rating :' + food.rating + ', ' + food.price + 'Tk',
                     "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
-                    "default_action": {
-                        "type": "web_url",
-                        "url": "fb.com/anjantb",
-                        "messenger_extensions": false,
-                        "webview_height_ratio": "tall"
-                    },
                     "buttons": [
                         {
                             "type": "postback",
@@ -149,6 +203,61 @@ function makeTemplate(foods) {
     else {
         return [];
     }
+}
+
+function makeTemplateFoods(foods) {
+     if (foods.length) {
+        let bodies = [];
+        foods.forEach(function(food){
+            let buttons = [];
+            let sub = food.restaurant[0].name + " ";
+            if(food.desc.length < 20) sub += food.desc; 
+
+            if(food.food_size.length){
+                food.food_size.forEach(function(size){
+                    sub += "\n" + size.size + "-" + size.price + " tk";
+                    let tem = {
+                        "type": "postback",
+                        "title": size.size,
+                        "payload": "FOOD_" + food._id + "_" + size._id
+                    };   
+                    buttons.push(tem);
+                });
+                // console.log(buttons);
+
+                let body = {
+                    "title": food.food_name,
+                    "subtitle": sub,
+                    "image_url": "https://www.w3schools.com/w3css/img_lights.jpg",
+                    "buttons": buttons
+                };
+                // console.log(" a body");
+                // console.log(body);
+                bodies.push(body);
+            } 
+            else {
+                console.log("no sizes");
+                return [];
+            }
+        });
+        // console.log(bodies);
+        let data = {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": bodies
+                }
+            }
+        }
+
+    
+        return data;
+    }
+    else {
+        return [];
+    }
+    
 }
 
 function makeTemplateCategory(restaurant, categories) {
@@ -181,12 +290,6 @@ function makeTemplateCategory(restaurant, categories) {
                         "title": food.food_name + " - " + food.category,
                         "subtitle": sub,
                         "image_url": "https://www.w3schools.com/w3css/img_lights.jpg",
-                        "default_action": {
-                            "type": "web_url",
-                            "url": "https://www.sigmindai.net/bbb/",
-                            "messenger_extensions": false,
-                            "webview_height_ratio": "tall"
-                        },
                         "buttons": buttons
                     };
                     // console.log(" a body");

@@ -45,6 +45,16 @@ module.exports.genRestaurantByRegionsGeneric = function (regions, index, callbac
     });
 }
 
+module.exports.genRestaurantByCuisines = function (cuisines , index, callback) {
+    let perPage = 10;
+    let page = index+1;
+    Restaurant.paginate({cuisine : { "$in" : cuisines}}, { page: page, limit: perPage }, function(err, result) {
+        console.log(result.total);
+        callback(err, makeTemplateGeneric(result.docs, false));
+    });
+
+};
+
 module.exports.genRestaurantByZip = function (zip, index, callback) {
     let perPage = 4;
     let page = index+1;
@@ -138,12 +148,6 @@ function makeTemplateGeneric(restaurants, viewFlag) {
                     "title": restaurant.name,
                     "subtitle": restaurant.cuisine + ', Rating :' + restaurant.rating + ', ' + restaurant.region,
                     "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
-                    "default_action": {
-                        "type": "web_url",
-                        "url": "fb.com/foodbot",
-                        "messenger_extensions": false,
-                        "webview_height_ratio": "tall"
-                    },
                     "buttons": [{
                         "type": "web_url",
                         "url": SERVER_URL + "/anjantb",
