@@ -55,34 +55,6 @@ module.exports.genRestaurantByCuisines = function (cuisines , index, callback) {
 
 };
 
-module.exports.genRestaurantByZip = function (zip, index, callback) {
-    let perPage = 4;
-    let page = index+1;
-    Restaurant.paginate({zip_code : zip}, { page: page, limit: perPage }, function(err, result) {
-        console.log(result.total);
-        if(result.total > (page)*perPage){
-            callback(err, makeTemplate(result.docs, true));
-        }
-        else {
-            callback(err, makeTemplate(result.docs, false));
-        }
-    });
-};
-
-module.exports.genRestaurantByCuisine = function (cuisine,index, callback) {
-    let perPage = 4;
-    let page = index+1;
-    Restaurant.paginate({cuisine : cuisine}, { page: page, limit: perPage }, function(err, result) {
-        console.log(result.total);
-        if(result.total > (page)*perPage){
-            callback(err, makeTemplate(result.docs, true));
-        }
-        else {
-            callback(err, makeTemplate(result.docs, false));
-        }
-    });
-
-};
 
 function makeTemplate(restaurants, viewFlag) {
     let view= [];

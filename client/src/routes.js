@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import Restaurants from './Components/Restaurants';
 import About from './Components/About/index';
+import Privacy from './Components/Privacy/Privacy';
 import NotFound from './Components/NotFound/index';
 import Notification from './Components/Notification/notification';
 
@@ -15,6 +16,7 @@ const Main = () => (
     <Switch>
       <Route exact path='/' component={Restaurants}/>
       <Route path='/about' component={About}/>
+      <Route path='/privacy' component={Privacy}/>
       <Route path="/not" component={Notification}/>
       <Route path='*' component={NotFound}/>
 

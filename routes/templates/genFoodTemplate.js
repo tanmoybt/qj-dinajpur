@@ -78,6 +78,36 @@ module.exports.genFoodsByFoods = function (food_tags, index, callback) {
 
 };
 
+
+
+module.exports.genFoodsByFoodRestaurant = function (food_tag, restaurant_name, index, callback) {
+    let perPage = 10;
+    let page = 1;
+    Restaurant.findOne({name: restaurant_name}, function (err, restaurant) {
+        if (err) callback(err, null);
+        if (restaurant) {
+
+            Food
+            .find({res_id: restaurant._id, food_tags: food_tag})
+            .limit(10)
+            .exec(function(err, foods){
+                
+                if(err) callback(err, null);
+                if(foods.length) {
+                    callback(null, makeTemplateFoodsRestaurant(foods, restaurant_name));
+                }
+                else {
+                    callback(null, makeTemplateFoodsRestaurant([], null));
+                }
+                
+            });
+        }
+        else {
+            callback(err, makeTemplateFoodsRestaurant([], null));
+        }
+    })
+};
+
 module.exports.genFoodsByIngredientFood = function (ing_food, index, callback) {
     
     let perPage = 10;
@@ -108,9 +138,34 @@ module.exports.genFoodsByIngredientFood = function (ing_food, index, callback) {
             callback(null, makeTemplateFoods(foods));
         }
     })
+};
 
-    
+module.exports.genFoodsByIngredientFoodRestaurant = function (ingredient_tag, food_tag, restaurant_name, index, callback) {
+    let perPage = 10;
+    let page = 1;
+    Restaurant.findOne({name: restaurant_name}, function (err, restaurant) {
+        if (err) callback(err, null);
+        if (restaurant) {
 
+            Food
+            .find({res_id: restaurant._id, food_tags: food_tag, ingredient_tags: ingredient_tag})
+            .limit(10)
+            .exec(function(err, foods){
+                
+                if(err) callback(err, null);
+                if(foods.length) {
+                    callback(null, makeTemplateFoodsRestaurant(foods, restaurant_name));
+                }
+                else {
+                    callback(null, makeTemplateFoodsRestaurant([], null));
+                }
+                
+            });
+        }
+        else {
+            callback(err, makeTemplateFoodsRestaurant([], null));
+        }
+    })
 };
 
 module.exports.genFoodByCuisine = function (cuisine, callback) {
@@ -173,7 +228,7 @@ module.exports.findFoodSizeByID = function (food_id, size_id, callback) {
 
 
 function makeTemplate(foods) {
-    if (!foods.size) {
+    if (foods.length) {
         let messageElements = foods.map(food => {
             return (
                 {
@@ -206,11 +261,67 @@ function makeTemplate(foods) {
 }
 
 function makeTemplateFoods(foods) {
+    console.log("single parameter")
      if (foods.length) {
         let bodies = [];
         foods.forEach(function(food){
             let buttons = [];
             let sub = food.restaurant[0].name + " ";
+            if(food.desc.length < 20) sub += food.desc; 
+
+            if(food.food_size.length){
+                food.food_size.forEach(function(size){
+                    sub += "\n" + size.size + "-" + size.price + " tk";
+                    let tem = {
+                        "type": "postback",
+                        "title": size.size,
+                        "payload": "FOOD_" + food._id + "_" + size._id
+                    };   
+                    buttons.push(tem);
+                });
+                // console.log(buttons);
+
+                let body = {
+                    "title": food.food_name,
+                    "subtitle": sub,
+                    "image_url": "https://www.w3schools.com/w3css/img_lights.jpg",
+                    "buttons": buttons
+                };
+                // console.log(" a body");
+                // console.log(body);
+                bodies.push(body);
+            } 
+            else {
+                console.log("no sizes");
+                return [];
+            }
+        });
+        // console.log(bodies);
+        let data = {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": bodies
+                }
+            }
+        }
+
+    
+        return data;
+    }
+    else {
+        return [];
+    }
+    
+}
+
+function makeTemplateFoodsRestaurant(foods, restaurant_name) {
+     if (foods.length) {
+        let bodies = [];
+        foods.forEach(function(food){
+            let buttons = [];
+            let sub = restaurant_name + " ";
             if(food.desc.length < 20) sub += food.desc; 
 
             if(food.food_size.length){

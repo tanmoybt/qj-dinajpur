@@ -90,8 +90,7 @@ export default class Region extends Component {
             //console.log(region.sub_zip_codes);
             return (
                 <div key={region.name}>
-                    <h3>{region.name + " -" + region.zip_code}</h3>
-                    <h6>{region.sub_zip_codes.join() + " " + region.sub_regions.join()}</h6>
+                    <h3>{region.name }</h3>
                 </div>
 
             )
@@ -118,9 +117,6 @@ export default class Region extends Component {
                                 <input type="text" className="form-control" value={this.state.name}
                                        onChange={this.handleNameChange} id="name"/>
 
-                                <label htmlFor="name">Zip Code</label>
-                                <input type="text" className="form-control" value={this.state.zip_code}
-                                       onChange={this.handleZipCodeChange} id="name"/>
 
                             </div>
 

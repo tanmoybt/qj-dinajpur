@@ -129,11 +129,11 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     }
 
     else if(action === 'showFoodsOnFoods'){
-        if(pipeline.data[sender].location.regions.length){
+        // if(pipeline.data[sender].location.regions.length){
             console.log(parameters);
             let messageData = {text: "I'm looking for " + parameters.food_tag[0] + " for you...😋🍦"};
             request.sendRequestcall(sender, messageData, function () {
-                foodTem.genFoodsByFoods(parameters.food_tag, 0 , function (err, results) {
+                resTem.genFoodsByFoods(parameters.food_tag, 0 , function (err, results) {
                     if (err) throw err;
                     else {
                         if (results.attachment) {
@@ -156,18 +156,18 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                     }
                 });
             })
-        }
-        else {
-            genLoc.genGetLocation(function(err, messageData){
-                if(!err){
-                    request.sendRequest(sender, messageData);
-                }
-            });
-        }
+        // }
+        // else {
+        //     genLoc.genGetLocation(function(err, messageData){
+        //         if(!err){
+        //             request.sendRequest(sender, messageData);
+        //         }
+        //     });
+        // }
     }
 
     else if(action === "showFoodsOnIngredientFood"){
-        if(pipeline.data[sender].location.regions.length){
+        // if(pipeline.data[sender].location.regions.length){
             console.log(parameters);
             let messageData = {text: "I'm looking for " + parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you...😋🍦"};
             request.sendRequestcall(sender, messageData, function () {
@@ -194,14 +194,77 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                     }
                 });
             })
-        }
-        else {
-            genLoc.genGetLocation(function(err, messageData){
-                if(!err){
-                    request.sendRequest(sender, messageData);
+        // }
+        // else {
+        //     genLoc.genGetLocation(function(err, messageData){
+        //         if(!err){
+        //             request.sendRequest(sender, messageData);
+        //         }
+        //     });
+        // }
+    }
+
+    else if(action === 'showFoodsOnFoodsRestaurants'){
+        console.log(parameters);
+        let messageData = {text: "I'm looking for " + parameters.food_tag[0] + " from " + parameters.restaurant_name[0] + " for you...😋🍦"};
+        request.sendRequestcall(sender, messageData, function () {
+            foodTem.genFoodsByFoodRestaurant(parameters.food_tag[0], parameters.restaurant_name[0], 0 , function (err, results) {
+                if (err) throw err;
+                else {
+                    console.log(results);
+                    if (results.attachment) {
+
+                        request.sendRequest(sender, results);
+                        
+                        setLastAction(sender, 'doNothing', null, []);
+                    }
+                    else {
+                        messageData = {text: "Sorry 🙁, I could not find what you are looking for ..."};
+                        request.sendRequestcall(sender, messageData, function () {
+                            
+                            genLoc.genGetRegion(function(err, messageData){
+                                if(!err){
+                                    request.sendRequest(sender, messageData);
+                                }
+                            });
+                        });
+                    }
                 }
             });
-        }
+        })
+    }
+    
+
+    else if(action === 'showFoodsOnIngredientFoodRestaurant'){
+        console.log(parameters);
+        let messageData = {text: "I'm looking for " + parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + 
+                                    " from " + parameters.restaurant_name[0] + " for you...😋🍦"};
+        request.sendRequestcall(sender, messageData, function () {
+            foodTem.genFoodsByIngredientFoodRestaurant(parameters.ingredient_food[0].ingredient_tag1, parameters.ingredient_food[0].food_tag1, parameters.restaurant_name[0], 0 , function (err, results) {
+                if (err) throw err;
+                else {
+                    console.log(results);
+                    if (results.attachment) {
+
+                        request.sendRequest(sender, results);
+                        
+                        setLastAction(sender, 'doNothing', null, []);
+                    }
+                    else {
+                        messageData = {text: "Sorry 🙁, I could not find what you are looking for ..."};
+                        request.sendRequestcall(sender, messageData, function () {
+                            
+                            genLoc.genGetRegion(function(err, messageData){
+                                if(!err){
+                                    request.sendRequest(sender, messageData);
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+        })
+        
     }
 
     else if(action === 'showFoodsOnAmountFoods'){
@@ -209,10 +272,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     }
 
     else if(action === 'showFoodsOnAmountIngredientFoods'){
-        
-    }
-
-    else if(action === 'showFoodsOnFoodsRestaurants'){
         
     }
 
