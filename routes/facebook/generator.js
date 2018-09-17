@@ -21,7 +21,7 @@ module.exports.foodAttending = function(err, sender, res, food){
 
         apiai.apiaiProcessor(sender, 'add ' + food.food_name + ' to my cart, confirm');
 
-        let messageData= {text: 'How many of '+ food.food_name + "(" + food.size + ") would you order?"};
+        let messageData= {text: 'How many of '+ food.food_name + " (" + food.size + ") would you order?"};
         request.sendRequest(sender, messageData);
 
     }
@@ -55,7 +55,7 @@ module.exports.foodAttendingRes = function(err, sender, res, food){
 
         apiai.apiaiProcessor(sender, 'add ' + food.food_name + ' to my cart, confirm');
 
-        let messageData= {text: 'How many of '+ food.food_name + "(" + food.size + ") would you order?"};
+        let messageData= {text: 'How many of '+ food.food_name + " (" + food.size + ") would you order?"};
         request.sendRequest(sender, messageData);
 
     }
@@ -66,14 +66,8 @@ module.exports.foodAttendingRes = function(err, sender, res, food){
 }
 
 module.exports.foodInLine = function(err, sender, res, food){
-	console.log('foodin line: ' + JSON.stringify(pipeline.data[sender], null, 2));
-	// console.log("foodinline ", pipeline.data[sender]);
-	pipeline.data[sender].foodInLine = food;
-	pipeline.data[sender].restaurantinline = { index: 0,
-                res_id: res.res_id, name: res.name, image_url: res.url, confirmed: false
-            };
-	let messageData= {text: "There are items in your cart from " + res.name + ", would you clear cart and add this item?"};
+	
+	let messageData= {text: "There are items in your cart from another restaurant, Please clear cart before proceeding."};
 
-	apiai.apiaiProcessor(sender, messageData.text);
 	request.sendRequest(sender, messageData);
 }

@@ -284,7 +284,7 @@ function makeTemplateFoods(foods) {
                 let body = {
                     "title": food.food_name,
                     "subtitle": sub,
-                    "image_url": "https://www.w3schools.com/w3css/img_lights.jpg",
+                    "image_url": "https://www.goodfoodstories.com/wp-content/uploads/2017/03/maple-bacon-polenta-casserole-2-Photograph-%C2%A9-Good-Food-Stories-LLC.jpg",
                     "buttons": buttons
                 };
                 // console.log(" a body");
@@ -339,7 +339,7 @@ function makeTemplateFoodsRestaurant(foods, restaurant_name) {
                 let body = {
                     "title": food.food_name,
                     "subtitle": sub,
-                    "image_url": "https://www.w3schools.com/w3css/img_lights.jpg",
+                    "image_url": "https://www.goodfoodstories.com/wp-content/uploads/2017/03/maple-bacon-polenta-casserole-2-Photograph-%C2%A9-Good-Food-Stories-LLC.jpg",
                     "buttons": buttons
                 };
                 // console.log(" a body");
@@ -400,7 +400,7 @@ function makeTemplateCategory(restaurant, categories) {
                     let body = {
                         "title": food.food_name + " - " + food.category,
                         "subtitle": sub,
-                        "image_url": "https://www.w3schools.com/w3css/img_lights.jpg",
+                        "image_url": "https://www.goodfoodstories.com/wp-content/uploads/2017/03/maple-bacon-polenta-casserole-2-Photograph-%C2%A9-Good-Food-Stories-LLC.jpg",
                         "buttons": buttons
                     };
                     // console.log(" a body");

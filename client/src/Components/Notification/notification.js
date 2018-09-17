@@ -6,7 +6,7 @@ export default class Notification extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            imgLink: 'https://yt3.ggpht.com/a-/AJLlDp3wYX5t60ur_Jn4hcf9RS-9F1N98zE6mHMGVg=s900-mo-c-c0xffffffff-rj-k-no',
+            imgLink: 'http://offers.foodnews24.com/wp-content/uploads/2017/01/16142978_1833260466921966_2700696126551847441_n.jpg',
             adText: '',
             sendState: false
         };

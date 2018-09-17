@@ -15,6 +15,9 @@ export default class Privacy extends Component {
 
         return (
             <div style={{padding: 5}}>
+                
+
+
                 <h1>Privacy Policy</h1>
 
 

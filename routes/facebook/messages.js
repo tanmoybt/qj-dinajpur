@@ -48,8 +48,12 @@ module.exports.messagesProcessor = function (sender, message) {
                         showRestaurants(sender, 'latlong', lat, lng, null)
 
                     }
-                    else if (pipeline.data[sender].shortContext === 'cart') {
+                    else if (pipeline.data[sender].shortContext === 'address') {
                         // context cart
+                        apiai.apiResetContext(sender);
+                        let messageData = {text: 'What is the best phone number to reach you? '};
+                        apiai.apiaiProcessor(sender, messageData.text);
+                        request.sendRequest(sender, messageData);
                     }
                     else {
                         console.log("context none");
@@ -72,11 +76,20 @@ module.exports.messagesProcessor = function (sender, message) {
             request.sendRequestcall(sender, messageData, function() {
                 if(pipeline.data[sender].shortContext === 'region') {
                     // context menu
+                    console.log("context region");
                     showRestaurants(sender, 'latlong', lat, lng, null)
 
                 }
-                else if (pipeline.data[sender].shortContext === 'cart') {
+                else if (pipeline.data[sender].shortContext === 'address') {
                     // context cart
+                    apiai.apiResetContext(sender);
+                    let messageData = {text: 'What is the best phone number to reach you? '};
+                    apiai.apiaiProcessor(sender, messageData.text);
+                    request.sendRequest(sender, messageData);
+                }
+                else {
+                    console.log("context none");
+                    showRestaurants(sender, 'latlong', lat, lng, null)
                 }
             });
             
@@ -99,7 +112,7 @@ module.exports.messagesProcessor = function (sender, message) {
             });
         }
         else if(message.quick_reply.payload === 'GET_ORDER'){
-            request.sendRequest(sender, {text: 'done'});
+            request.sendRequest(sender, {text: 'Your order is on the way'});
         }
         else {
             let res = message.quick_reply.payload.split("_");

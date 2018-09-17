@@ -79,12 +79,6 @@ module.exports.genCartCarousel = function (restaurant, foods) {
                     "title": food.food_name + ', Qty. ' + food.quantity + ', price: Tk ' + food.price,
                     "subtitle": food.size,
                     "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
-                    "default_action": {
-                        "type": "web_url",
-                        "url": "fb.com/anjantb",
-                        "messenger_extensions": false,
-                        "webview_height_ratio": "compact"
-                    },
                     "buttons": [
                         {
                             "type": "postback",
@@ -105,12 +99,6 @@ module.exports.genCartCarousel = function (restaurant, foods) {
                 "title": 'Cart total : Tk ' + amount + ' from ' + restaurant,
                 "subtitle": 'Cart',
                 "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
-                "default_action": {
-                    "type": "web_url",
-                    "url": "fb.com/anjantb",
-                    "messenger_extensions": false,
-                    "webview_height_ratio": "compact"
-                },
                 "buttons": [
                     {
                         "type": "postback",
@@ -120,7 +108,7 @@ module.exports.genCartCarousel = function (restaurant, foods) {
                     {
                         "type": "postback",
                         "title": "Cancel",
-                        "payload": 'CANCEL_CART'
+                        "payload": 'CLEAR_CART_POSTBACK'
                     }
                 ]
             };

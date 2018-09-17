@@ -98,34 +98,34 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     }
 
     else if(action === 'showMenuOnRestaurant'){
-        setLastAction(sender, 'doNothing', null, []);
-        console.log(parameters.restaurant_name);
+        // setLastAction(sender, 'doNothing', null, []);
+        // console.log(parameters.restaurant_name);
 
-        foodTem.genFoodByRestaurant(parameters.restaurant_name, function (err, results) {
-            console.log('full result : ' + JSON.stringify(results, null, 2));
-            if(result[0].data.attachment.payload.elements.length > 0) {
-                let messageData = {text: "food menu for restaurant " + parameters.restaurant_name + ". Pick other restaurants and see their menu. "};
+        // foodTem.genFoodByRestaurant(parameters.restaurant_name, function (err, results) {
+        //     console.log('full result : ' + JSON.stringify(results, null, 2));
+        //     if(result[0].data.attachment.payload.elements.length > 0) {
+        //         let messageData = {text: "food menu for restaurant " + parameters.restaurant_name + ". Pick other restaurants and see their menu. "};
             
-                request.sendRequestcall(sender, messageData, function(){
-                    results.forEach(function(result){
-                        //apiai.apiaiProcessor(sender, 'The restaurant ' + postback.payload+ ' is picked, traced to no action');
-                        request.sendRequestcall(sender, {text: result.cat}, function(){
-                            request.sendRequest(sender, result.data);
-                        })
-                    });
-                });
-            }
-            else {
-                let messageData = {text: "Sorry, " + parameters.restaurant_name + " is not in our list yet, You could checkout other restaurants"};
-                request.sendRequestcall(sender, messageData, function () {
-                    genLoc.genGetLocation(function(err, messageData){
-                        if(!err){
-                            request.sendRequest(sender, messageData);
-                        }
-                    });
-                });
-            }
-        });
+        //         request.sendRequestcall(sender, messageData, function(){
+        //             results.forEach(function(result){
+        //                 //apiai.apiaiProcessor(sender, 'The restaurant ' + postback.payload+ ' is picked, traced to no action');
+        //                 request.sendRequestcall(sender, {text: result.cat}, function(){
+        //                     request.sendRequest(sender, result.data);
+        //                 })
+        //             });
+        //         });
+        //     }
+        //     else {
+        //         let messageData = {text: "Sorry, " + parameters.restaurant_name + " is not in our list yet, You could checkout other restaurants"};
+        //         request.sendRequestcall(sender, messageData, function () {
+        //             genLoc.genGetLocation(function(err, messageData){
+        //                 if(!err){
+        //                     request.sendRequest(sender, messageData);
+        //                 }
+        //             });
+        //         });
+        //     }
+        // });
     }
 
     else if(action === 'showFoodsOnFoods'){
@@ -169,31 +169,45 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
     else if(action === "showFoodsOnIngredientFood"){
         // if(pipeline.data[sender].location.regions.length){
             console.log(parameters);
-            let messageData = {text: "I'm looking for " + parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you...😋🍦"};
-            request.sendRequestcall(sender, messageData, function () {
-                foodTem.genFoodsByIngredientFood(parameters.ingredient_food[0], 0 , function (err, results) {
-                    if (err) throw err;
-                    else {
-                        if (results.attachment) {
+            if(parameters.ingredient_food[0].ingredient_tag1 && parameters.ingredient_food[0].food_tag1){
 
-                            request.sendRequest(sender, results);
-                            
-                            setLastAction(sender, 'doNothing', null, []);
-                        }
+                let messageData = {text: "I'm looking for " + parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you...😋🍦"};
+                request.sendRequestcall(sender, messageData, function () {
+                    foodTem.genFoodsByIngredientFood(parameters.ingredient_food[0], 0 , function (err, results) {
+                        if (err) throw err;
                         else {
-                            messageData = {text: "Sorry 🙁, I could not find any "+ parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you "};
-                            request.sendRequestcall(sender, messageData, function () {
+                            if (results.attachment) {
+
+                                request.sendRequest(sender, results);
                                 
-                                genLoc.genGetRegion(function(err, messageData){
-                                    if(!err){
-                                        request.sendRequest(sender, messageData);
-                                    }
+                                setLastAction(sender, 'doNothing', null, []);
+                            }
+                            else {
+                                messageData = {text: "Sorry 🙁, I could not find any "+ parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you "};
+                                request.sendRequestcall(sender, messageData, function () {
+                                    
+                                    genLoc.genGetRegion(function(err, messageData){
+                                        if(!err){
+                                            request.sendRequest(sender, messageData);
+                                        }
+                                    });
                                 });
-                            });
+                            }
                         }
-                    }
+                    });
+                })
+            }
+            else {
+                messageData = {text: "Sorry 🙁, I could not find any "+ parameters.ingredient_food[0].ingredient_tag1 + " " + parameters.ingredient_food[0].food_tag1 + " for you "};
+                request.sendRequestcall(sender, messageData, function () {
+                    
+                    genLoc.genGetRegion(function(err, messageData){
+                        if(!err){
+                            request.sendRequest(sender, messageData);
+                        }
+                    });
                 });
-            })
+            }
         // }
         // else {
         //     genLoc.genGetLocation(function(err, messageData){
@@ -267,22 +281,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         
     }
 
-    else if(action === 'showFoodsOnAmountFoods'){
-        
-    }
-
-    else if(action === 'showFoodsOnAmountIngredientFoods'){
-        
-    }
-
-    else if(action === 'showFoodsOnAmountFoodsRestaurant'){
-        
-    }
-
-    else if(action === 'showFoodsOnAmountIngredientFoodsRestaurant'){
-        
-    }
-
     else if(action === 'addFoodGetQuantity'){
         let speech = 'You were about to tell me how many ' + pipeline.data[sender].foodattending.food_name + ' you would like';
         setLastAction(sender, 'addFoodGetQuantity', speech, []);
@@ -290,12 +288,14 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
 
     else if(action === 'addToCart.addToCart-selectnumber'){
         let qu = parameters.number[0];
-        console.log(qu);
         let food = pipeline.data[sender].foodattending;
+
         food.quantity= qu;
+
         pipeline.data[sender].foods.push(food);
         pipeline.data[sender].foodattending= {};
-        setLastAction(sender, 'none', '', []);
+        setLastAction(sender, 'doNothing', '', []);
+
         let messageData= {text: qu +' '+ food.food_name + ' in your cart. You can view your cart for checkout or continue shopping.'};
         request.sendRequest(sender, messageData);
     }
@@ -331,45 +331,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         request.sendRequest(sender, messageData);
     }
 
-    else if(action === 'changeRestaurant.changeRestaurant-yes'){
-        pipeline.data[sender].foodattending= pipeline.data[sender].foodinline;
-        pipeline.data[sender].restaurantinline= pipeline.data[sender].food;
-
-        apiai.apiaiProcessor(sender, 'add ' + pipeline.data[sender].foodattending.food_name + ' to my cart, confirm');
-
-        let messageData= {text: 'How many of '+ pipeline.data[sender].foodattending.food_name + "(" + pipeline.data[sender].foodattending.size + ") would you order?"};
-        request.sendRequest(sender, messageData);
-    }
-
-    else if(action === 'deliverylocationConfirm.deliverylocationConfirm-yes'){
-        setLastAction(sender, 'none', '', []);
-        pipeline.data[sender].location.confirmed = true;
-        let messageData= {text: 'The order will be delivered at ' + pipeline.data[sender].location.address};
-        request.sendRequestcall(sender, genCart.genCart(pipeline.data[sender].foods), function () {
-            request.sendRequest(sender, genCart.genConfirmOrder());
-        });
-    }
-
-    else if(action === 'deliverylocationConfirm.deliverylocationConfirm-no'){
-        setLastAction(sender, 'none', '', []);
-        pipeline.data[sender].location.confirmed = false;
-        request.sendRequest(sender, genLoc.genGetAddress());
-    }
-
-    else if(action === 'deliveryLocationNoGetAddress'){
-        if(parameters.address){
-            pipeline.data[sender].location.address = parameters.address;
-            pipeline.data[sender].location.confirmed = true;
-            let messageData = {text: 'What is the best phone number to reach you? '};
-            request.sendRequest(sender, messageData);
-            apiai.apiaiProcessor(sender, messageData.text);
-            // request.sendRequestcall(sender, genCart.genCart(pipeline.data[sender].foods), function () {
-            //     request.sendRequest(sender, genCart.genConfirmOrder());
-            // });
-
-        }
-    }
-
     else if(action === 'onCheckoutGotAddress'){
         pipeline.data[sender].location.address = resolvedQuery;
         pipeline.data[sender].location.confirmed = true;
@@ -379,8 +340,8 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
         apiai.apiaiProcessor(sender, messageData.text);
     }
 
-    else if(action === 'deliverySetPhoneNumber'){
-        pipeline.data[sender].phone = parameters.phonenumber;
+    else if(action === 'onDeliveryPhoneNumberGotPhone'){
+        pipeline.data[sender].phone = parameters.number;
         request.sendRequestcall(sender, genCart.genCart(sender), function () {
             request.sendRequest(sender, genCart.genConfirmOrder());
         });

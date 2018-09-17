@@ -10,7 +10,7 @@ const FoodTag = require('../model/Food_Tags');
 const IngredientTag = require('../model/Ingredients_Tags');
 const Regions = require('../model/Regions');
 const Profiles = require('../model/Profiles');
-const request = require('./facebook/requests');
+const request = require('request');
 
 apiRouter.route('/restaurants')
     .get(function(req, res) {
@@ -327,7 +327,7 @@ apiRouter.route('/notification')
 
     });
 
-const PAGE_ACCESS_TOKEN = 'EAAcaq8rzMQoBAMLg5fdc893vSV2p26QTheGOS3q8JH1Y1szZAJJwTugIMChiL1vrxdSzc1COm6cd5QHmjr6BKRO1fx1QxPynXjG1GTnOlRSduNdUaigyZC41zbOh5yKilgj5BGkfp40d5MZBSqwTZAYWfdlriItZC7kTqPUYD4AZDZD';
+const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAIsqPdoRxn8WumndMZBUFCuvvUguFUPS0V9LL7A13SbqCPzWbP77weIJhW9W9X6pXn6TmfaHaJhVRlFGcqo087hjxBXYPVfWSP0lg1RsO6jk4PCMZCxUZC9vd8zgdkLgGwY8racKtv3WB4yZA0KSgAEArXhqYAZDZD';
 
 function sendRequestcall(sender, messageData, callback) {
     request({
@@ -355,15 +355,9 @@ function sendRequestcall(sender, messageData, callback) {
 function makeTemplate(imgLink, adText) {
     
     let temp = [{
-                    "title": "Order from quijjin today and enjoy the offer",
+                    "title": "Order from Foodbot today and enjoy the offer",
                     "subtitle": adText,
                     "image_url": imgLink,
-                    "default_action": {
-                        "type": "web_url",
-                        "url": "fb.com/anjantb",
-                        "messenger_extensions": false,
-                        "webview_height_ratio": "tall"
-                    },
                     "buttons": [
                         {
                             "type": "postback",

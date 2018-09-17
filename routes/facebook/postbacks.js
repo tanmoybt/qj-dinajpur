@@ -12,6 +12,8 @@ const genLoc = require('../templates/genGetLocation');
 const genCart = require('../templates/genCartTemplate');
 
 module.exports.postbackProcessor = function (sender, postback) {
+    pipeline.setSenderData(sender);
+
     if(postback.payload === 'GET_STARTED_PAYLOAD'){
         request.getProfile(sender, function (name) {
             pipeline.setSenderData(sender);
@@ -41,7 +43,6 @@ module.exports.postbackProcessor = function (sender, postback) {
     }
 
     else if (postback.payload.includes('FOOD')) {
-        pipeline.setSenderData(sender);
         console.log('Food : ' + postback.payload);
         let items = postback.payload.split('_');
 
@@ -95,7 +96,7 @@ module.exports.postbackProcessor = function (sender, postback) {
         });
     }
 
-    else if (postback.title === 'View cart') {
+    else if (postback.payload === 'VIEW_CART_POSTBACK') {
         console.log('cart : ' + postback.payload);
         if (pipeline.data[sender] && pipeline.data[sender].foods) {
             request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].restaurant.name, pipeline.data[sender].foods));
@@ -106,30 +107,11 @@ module.exports.postbackProcessor = function (sender, postback) {
         }
     }
 
-    else if (postback.payload === 'CANCEL_CART'){
+    else if (postback.payload === 'CLEAR_CART_POSTBACK'){
         pipeline.clearSenderData(sender);
         let messageData = {text: 'Cart is cleared'};
         request.sendRequest(sender, messageData);
         
-    }
-
-    else if (postback.title === 'Restart bot') {
-        if (pipeline.data[sender]) {
-            apiai.apiaiProcessor(sender, postback.title);
-        }
-        else {
-            actions.actionsProcessor(sender, 'restartBotConfirm', 'Bot Restarted');
-        }
-    }
-
-    else if (postback.title === 'View More') {
-        if (pipeline.data[sender]) {
-            viewMoreProcessor(sender, pipeline.data[sender].location.address,
-                pipeline.data[sender].location.zip, pipeline.data[sender].location.region);
-        }
-        else {
-            actions.actionsProcessor(sender, 'restartBotConfirm', 'Bot Restarted');
-        }
     }
 
     else if (postback.payload.includes('CHANGE')){
@@ -187,15 +169,9 @@ module.exports.postbackProcessor = function (sender, postback) {
 
     else if (postback.payload ==='CHECKOUT'){
         if(pipeline.data[sender].foods.length>0){
-            if(pipeline.data[sender].location.address && !pipeline.data[sender].location.confirmed){
-                apiai.apiaiProcessor(sender, 'ready for checkout, the address is ' + pipeline.data[sender].location.address);
-                let messageData = {text: 'Great! Would you like delivery at this address : '+ pipeline.data[sender].location.address};
-                request.sendRequest(sender, messageData);
-            }
-            else {
-                apiai.apiaiProcessor(sender, 'ready for checkout, without an addrress');
-                request.sendRequest(sender, genLoc.genGetAddress());
-            }
+            apiai.apiaiProcessor(sender, 'ready for checkout, without an addrress');
+            pipeline.data[sender].shortContext= 'address';
+            request.sendRequest(sender, genLoc.genGetAddress());
         }
         else {
             let messageData = {text: "Please add items to cart for checkout"};
@@ -204,7 +180,7 @@ module.exports.postbackProcessor = function (sender, postback) {
     }
 
     else if (postback.payload === 'GET_ORDER'){
-        request.sendRequest(sender, {text: ':D'});
+        request.sendRequest(sender, {text: 'Your Order is on the way !!'});
     }
 };
 

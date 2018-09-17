@@ -84,7 +84,7 @@ module.exports.genGetRegion = function (cb) {
 
 module.exports.genGetAddress = function () {
     return {
-        "text": "Please share your location if you'd like delivery at your place, Or tell me an address of delivery:",
+        "text": "Please share your location if you'd like delivery at your place",
         "quick_replies": [
             {
                 "content_type": "location",
