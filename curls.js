@@ -86,9 +86,9 @@ curl -X POST -H "Content-Type: application/json" -d '{
           "type":"nested",
           "call_to_actions":[
             {
-              "title":"Restart bot",
+              "title":"Unsubscribe",
               "type":"postback",
-              "payload":"RESTART_BOT_POSTBACK"
+              "payload":"UNSUBSCRIBE_POSTBACK"
             },
             {
               "title":"Developed by BIGGO LTD",

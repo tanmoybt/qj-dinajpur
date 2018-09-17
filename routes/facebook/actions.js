@@ -133,7 +133,7 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
             console.log(parameters);
             let messageData = {text: "I'm looking for " + parameters.food_tag[0] + " for you...😋🍦"};
             request.sendRequestcall(sender, messageData, function () {
-                resTem.genFoodsByFoods(parameters.food_tag, 0 , function (err, results) {
+                foodTem.genFoodsByFoods(parameters.food_tag, 0 , function (err, results) {
                     if (err) throw err;
                     else {
                         if (results.attachment) {

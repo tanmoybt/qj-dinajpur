@@ -32,6 +32,14 @@ module.exports.postbackProcessor = function (sender, postback) {
         });
     }
 
+    else if(postback.payload === 'UNSUBSCRIBE_POSTBACK'){
+        let messageData = {text: "You are unsubscribed from notifications from me :) "};
+            
+        request.sendRequestcall(sender, messageData, function(){
+            
+        });
+    }
+
     else if (postback.payload.includes('FOOD')) {
         pipeline.setSenderData(sender);
         console.log('Food : ' + postback.payload);
