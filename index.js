@@ -13,19 +13,14 @@ mongoose.Promise = require('bluebird');
 mongoose.connect('mongodb://tanmoy12:asdfgh123456@ds241530.mlab.com:41530/qjdj', { useMongoClient: true })
     .then(() => { // if all is ok we will be here
         console.log('Start');
-        // const genRes = require('./routes/templates/genRestaurantTemplate');
-        // genRes.genRestaurantByZip('1111', function(err, result){
-        //     if(err) console.log(err);
-        //     else {
-        //         console.log(JSON.stringify(result, null,2));
-        //     }
-        // });
+        
     })
     .catch(err => { // if error we will be here
         console.error('DB not connected');
-        // process.exit(1);
     });
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -45,6 +40,7 @@ app.use(function(req, res, next) {
 // Serve static files from the React app
 
 app.use(express.static(path.join(__dirname, 'client/build')));
+
 const apiRouter = require('./routes/api');
 app.use('/api', apiRouter);
 
@@ -53,9 +49,8 @@ app.use(express.static(process.cwd() + '/public'));
 const webhook = require('./routes/facebook/webhook');
 app.use('/webhook', webhook);
 
-app.use(function(req, res) {
-    res.status(404).send({url: req.originalUrl + ' not found'})
-});
+var resRouter = require('./routes/res');
+app.use('/menu', resRouter);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));

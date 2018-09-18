@@ -1,5 +1,5 @@
 {
-  "name": "Quijinn",
+  "name": "Foodbot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -20,12 +20,12 @@
     "cors": "^2.8.4",
     "eslint": "^4.19.1",
     "express": "^4.16.3",
+    "hbs": "^4.0.1",
     "mongoose": "^4.13.13",
     "mongoose-paginate": "^5.0.3",
     "node-geocoder": "^3.22.0",
     "node-wit": "^4.3.0",
     "nodemon": "^1.17.4",
-    "react-select": "^1.2.1",
     "request": "^2.86.0"
   }
 }
