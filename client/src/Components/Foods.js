@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import axios from 'axios';
 
 import Select from 'react-select';
-import 'react-select/dist/react-select.css';
 
 import FoodBox from './FoodBox';
 import FoodSize from "./FoodSize";

@@ -7,7 +7,7 @@ var Handlebars=require('hbs');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('notFound', { title: 'Restaurant not found' });
 });
 
 router.get('/:resturant_name', function(req, res, next) {
@@ -36,7 +36,7 @@ router.get('/:resturant_name', function(req, res, next) {
             //console.log(Foods);
             //console.log(res_id);
 
-            res.render('menucard', { Foods:Foods,count:count,res_id:res_id,res_name:resturant_name,title: 'Express' });
+            res.render('menucard', { Foods:Foods,count:count,res_id:res_id,res_name:resturant_name,title: resturant_name });
 
           }
       });
