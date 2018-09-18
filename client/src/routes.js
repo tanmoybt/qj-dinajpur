@@ -5,6 +5,8 @@ import About from './Components/About/index';
 import Privacy from './Components/Privacy/Privacy';
 import NotFound from './Components/NotFound/index';
 import Notification from './Components/Notification/notification';
+import Menu from './Components/Menu/Menu';
+
 
 // The Main component renders one of the three provided
 // Routes (provided that one matches). Both the /roster
@@ -15,10 +17,10 @@ const Main = () => (
   <main>
     <Switch>
       <Route exact path='/' component={Restaurants}/>
+      <Route path='/menu' component={Menu}/>
       <Route path='/about' component={About}/>
       <Route path='/privacy' component={Privacy}/>
       <Route path="/not" component={Notification}/>
-      <Route path='*' component={NotFound}/>
 
     </Switch>
   </main>

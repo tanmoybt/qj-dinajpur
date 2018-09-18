@@ -19,8 +19,6 @@ mongoose.connect('mongodb://tanmoy12:asdfgh123456@ds241530.mlab.com:41530/qjdj',
         console.error('DB not connected');
     });
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -33,13 +31,14 @@ app.use(function(req, res, next) {
         'X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers');
 //and remove cacheing so we get the most recent comments
     res.setHeader('Cache-Control', 'no-cache');
+
+    
     next();
 });
 
-
 // Serve static files from the React app
 
-app.use(express.static(path.join(__dirname, 'client/build')));
+
 
 const apiRouter = require('./routes/api');
 app.use('/api', apiRouter);
@@ -49,15 +48,11 @@ app.use(express.static(process.cwd() + '/public'));
 const webhook = require('./routes/facebook/webhook');
 app.use('/webhook', webhook);
 
-var resRouter = require('./routes/res');
-app.use('/menu', resRouter);
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
-
-
-
 
 const port = process.env.PORT || 8000;
 

@@ -21,11 +21,11 @@
     "eslint": "^4.19.1",
     "express": "^4.16.3",
     "hbs": "^4.0.1",
-    "mongoose": "^4.13.13",
+    "mongoose": "^4.13.17",
     "mongoose-paginate": "^5.0.3",
     "node-geocoder": "^3.22.0",
     "node-wit": "^4.3.0",
-    "nodemon": "^1.17.4",
-    "request": "^2.86.0"
+    "nodemon": "^1.18.4",
+    "request": "^2.88.0"
   }
 }
