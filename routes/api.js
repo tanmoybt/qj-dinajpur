@@ -120,6 +120,22 @@ apiRouter.route('/foods/:restaurant_id')
         });
     });
 
+apiRouter.route('/menu/:restaurant_name')
+    .get(function(req, res) {
+        Restaurant.findOne({ name: req.params.restaurant_name }, function(err, restaurant){
+            if(restaurant){
+                Food.find({ res_id: restaurant._id }, function(err, foods) {
+                    if (err) res.json({error: "error"});
+                    else res.json(foods);
+                });
+            }
+            else{
+                res.json({error: "error"});
+            }
+            
+        })
+    });
+
 apiRouter.route('/foods')
     .post(function(req, res) {
         const food = new Food();

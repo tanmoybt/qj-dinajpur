@@ -6,8 +6,8 @@ export default class Notification extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pillow: 'off',
-            text: "",
+            foods: [],
+            error: null,
             sender: null
         };
     }
@@ -23,7 +23,7 @@ export default class Notification extends Component {
 
     sendData = () => {
         if(this.state.sender){
-            axios.post("/api/cartdata", {data: this.state})
+            axios.post("api/cartdata", {data: this.state})
                 .then(function(res){
                     console.log(res);
                 })
@@ -67,30 +67,81 @@ export default class Notification extends Component {
                 // error retrieving supported features
                 console.log(err);
             });
-
-            document.getElementById('submitButton').addEventListener('click', () => {
-                that.sendData();
-                window.MessengerExtensions.requestCloseBrowser(function success() {
-                    console.log("Webview closing");
-                }, function error(err) {
-                    console.log(err);
-                });
-            });
         };
     }
 
+    onSubmit = e => {
+        if(this.state.sender){
+            axios.post("api/cartdata", {data: this.state})
+                .then(function(res){
+                    console.log(res);
+                    window.MessengerExtensions.requestCloseBrowser(function success() {
+                        console.log("Webview closing");
+                    }, function error(err) {
+                        console.log(err);
+                    });
+                })
+                .catch(function(err){
+                    console.log(err);
+                    window.MessengerExtensions.requestCloseBrowser(function success() {
+                        console.log("Webview closing");
+                    }, function error(err) {
+                        console.log(err);
+                    });
+                })
+        }
+        else {
+            window.MessengerExtensions.requestCloseBrowser(function success() {
+                console.log("Webview closing");
+            }, function error(err) {
+                console.log(err);
+            });
+        }
+        
+    }
+
     componentDidMount() {
+
         this.loadFbMessengerApi();
+        console.log(this.props.match.params.restaurant_name);
+        let that=this;
+        axios.get("/api/menu/" + this.props.match.params.restaurant_name)
+            .then(res => {
+                if(res.data.error){
+                    that.setState({error: "error"});
+                }
+                else{
+                    that.setState({foods: res.data});
+                }
+                console.log(res.data);
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
 
     render() {
         return (
-            <div>
-                <h3>Pillows</h3>
-                <input type="checkbox" name="pillows" onChange={this.pillowChange} />
-                <input type="text" name="pillows" onChange={this.textChange}/>
-                <input type="button" id="submitButton" onClick={this.press} value="press"/>
+            <div style={{padding: 3}}>
+                <div style={{display: "flex", marginBottom: 16}}>
+                    <h1 style={{flex: 1}}>{this.props.match.params.restaurant_name}</h1>
+                    <h2 ><i className="fas fa-shopping-cart"></i><sup id="count">0</sup></h2>
+                </div>
+                {this.state.error && 
+                    <h2>Restaurant not found</h2>
+                }
+                {!this.state.error && !this.state.foods.length &&
+                    <h2>Food Menu Loading</h2>
+                }
+                {this.state.foods.length && !this.state.error &&
+                    <div>
+                        Hi
+                    </div>
+                }
+                <div>
+
+                </div>
             </div>
         )
     }
