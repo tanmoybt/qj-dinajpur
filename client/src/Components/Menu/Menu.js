@@ -69,7 +69,7 @@ export default class Notification extends Component {
     }
 
     onSubmit = e => {
-        if(!this.state.sender){
+        if(this.state.sender){
             axios.post("/api/cartdata", {cart: this.state.cart, sender: this.state.sender, restaurant: this.props.match.params.restaurant_name})
                 .then(function(res){
                     console.log(res);
