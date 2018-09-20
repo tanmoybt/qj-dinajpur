@@ -124,10 +124,13 @@ apiRouter.route('/menu/:restaurant_name')
     .get(function(req, res) {
         Restaurant.findOne({ name: req.params.restaurant_name }, function(err, restaurant){
             if(restaurant){
-                Food.find({ res_id: restaurant._id }, function(err, foods) {
-                    if (err) res.json({error: "error"});
-                    else res.json(foods);
-                });
+                Food.aggregate([{$match: {res_id: restaurant._id}},
+                    { $group : { _id : "$category", foods: { $push: "$$ROOT" } } }], 
+                    function(err, foods){
+                        if (err) res.json({error: "error"});
+                        else res.json(foods);
+                    }
+                );
             }
             else{
                 res.json({error: "error"});
