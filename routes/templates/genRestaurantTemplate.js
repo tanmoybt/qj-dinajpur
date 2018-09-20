@@ -1,7 +1,7 @@
 const Restaurant = require('../../model/Restaurants');
 const Food = require('../../model/Foods');
 
-let SERVER_URL = "https://www.facebook.com";
+let SERVER_URL = "https://ancient-fjord-45295.herokuapp.com/";
 
 module.exports.genRestaurantByRegion = function (region, index, callback) {
     let perPage = 4;
@@ -122,7 +122,7 @@ function makeTemplateGeneric(restaurants, viewFlag) {
                     "image_url": "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg",
                     "buttons": [{
                         "type": "web_url",
-                        "url": SERVER_URL + "/anjantb",
+                        "url": SERVER_URL + "/menu/" + restaurant.name,
                         "title": "MENU",
                         "webview_height_ratio": "tall",
                         "messenger_extensions": true

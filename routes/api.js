@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const apiRouter = express.Router();
+const generator = require('./facebook/generator');
 
 const Restaurant = require('../model/Restaurants');
 const Food = require('../model/Foods');
@@ -349,8 +350,9 @@ apiRouter.route('/notification')
 apiRouter.route('/cartdata')
     .post(function(req, res) {
         // const food = new Food();
+        res.json({ok: "ok"});
         console.log(req.body);
-        res.json({ok: "ok"})
+        generator.foodFromMenu(req.body.sender, req.body.cart, req.body.restaurant);
 
     });
 

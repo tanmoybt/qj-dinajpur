@@ -31,6 +31,17 @@ module.exports.foodAttending = function(err, sender, res, food){
     }
 }
 
+module.exports.foodFromMenu = function(sender, foods, restaurant){
+    pipeline.setSenderData(sender);
+    if (!foods.length || pipeline.data[sender].restaurant.name) return;
+
+    pipeline.data[sender].foods = foods;
+
+    let messageData= {text: "Your order from " + restaurant + " is in your cart :D"};
+    request.sendRequest(sender, messageData);
+    
+}
+
 module.exports.foodAttendingRes = function(err, sender, res, food){
 	if (err || !food ) return;
 
