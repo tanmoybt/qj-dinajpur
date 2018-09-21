@@ -275,7 +275,7 @@ export default class Notification extends Component {
                 }
                 <div style={{position: 'fixed', bottom: 5, left: 0, width: '100%'}}>
 
-                    {!this.state.sender &&
+                    {this.state.sender &&
                          <button disabled={!this.state.cart.length} style={{width: '100%'}} className="btn btn-danger" onClick={this.onSubmit}>
                             Submit
                         </button>
