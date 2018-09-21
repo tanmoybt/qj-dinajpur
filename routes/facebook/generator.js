@@ -31,11 +31,18 @@ module.exports.foodAttending = function(err, sender, res, food){
     }
 }
 
-module.exports.foodFromMenu = function(sender, foods, restaurant){
+module.exports.foodFromMenu = function(sender, foods, restaurant, res_id){
     pipeline.setSenderData(sender);
-    if (!foods.length || pipeline.data[sender].restaurant.name) return;
+    if (!foods.length || !pipeline.data[sender].restaurant) return;
 
     pipeline.data[sender].foods = foods;
+    pipeline.data[sender].restaurant = { index: 0,
+                res_id: res_id, name: restaurant, 
+                image_url: "https://media-cdn.tripadvisor.com/media/photo-s/0a/56/44/5a/restaurant.jpg", 
+                confirmed: false
+            };
+
+            console.log(pipeline.data[sender]);
 
     let messageData= {text: "Your order from " + restaurant + " is in your cart :D"};
     request.sendRequest(sender, messageData);

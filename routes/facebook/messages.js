@@ -35,8 +35,6 @@ module.exports.messagesProcessor = function (sender, message) {
                 console.log(res);
                 console.log(res[0].formattedAddress);
                 
-                pipeline.data[sender].location = {address: message.attachments[0].title, value: true};
-
                 let messageData = {text: 'your location is ' + res[0].formattedAddress + '🎪'};
                 pipeline.data[sender].location.address = res[0].formattedAddress;
                 pipeline.data[sender].address.address = res[0].formattedAddress;
@@ -139,6 +137,7 @@ function showRestaurants(sender, mode, lat, long, region) {
                 if (results.length) {
                     console.log(results)
                     let finalRegions = [] ;
+                    console.log(JSON.stringify(pipeline.data[sender], null, 2));
                     for(let i=0;i<results.length;i++){
                         pipeline.data[sender].location.regions.push(results[i].name);
                         finalRegions.push(results[i].name);

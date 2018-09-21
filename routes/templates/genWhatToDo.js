@@ -8,11 +8,6 @@ module.exports.genWhatToDo = function () {
                 "content_type": "text",
                 "title": "ORDER FOOD",
                 "payload": "ORDER_FOOD"
-            },
-            {
-                "content_type": "text",
-                "title": "BOOK TABLE",
-                "payload": "BOOK_TABLE"
             }
         ]
     };
@@ -26,11 +21,6 @@ module.exports.genGetStarted = function (name) {
                 "content_type": "text",
                 "title": "ORDER FOOD",
                 "payload": "ORDER_FOOD"
-            },
-            {
-                "content_type": "text",
-                "title": "BOOK TABLE",
-                "payload": "BOOK_TABLE"
             }
         ]
     };

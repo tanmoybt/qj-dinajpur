@@ -352,7 +352,7 @@ apiRouter.route('/cartdata')
         // const food = new Food();
         res.json({ok: "ok"});
         console.log(req.body);
-        generator.foodFromMenu(req.body.sender, req.body.cart, req.body.restaurant);
+        generator.foodFromMenu(req.body.sender, req.body.cart, req.body.restaurant, req.body.res_id);
 
     });
 
