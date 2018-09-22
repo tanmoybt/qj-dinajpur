@@ -15,7 +15,8 @@ export default class Notification extends Component {
             sender: null,
             cart: [],
             cartCount: 0,
-            disables: []
+            disables: [],
+            res_id: null
         };
     }
 
@@ -70,7 +71,7 @@ export default class Notification extends Component {
 
     onSubmit = e => {
         if(this.state.sender){
-            axios.post("/api/cartdata", {cart: this.state.cart, sender: this.state.sender, restaurant: this.props.match.params.restaurant_name})
+            axios.post("/api/cartdata", {cart: this.state.cart, sender: this.state.sender, restaurant: this.props.match.params.restaurant_name, res_id: this.state.res_id})
                 .then(function(res){
                     console.log(res);
                     window.MessengerExtensions.requestCloseBrowser(function success() {
@@ -110,7 +111,7 @@ export default class Notification extends Component {
                             });
                         });
                     });
-                    that.setState({foods: res.data});
+                    that.setState({foods: res.data, res_id: res.data[0].foods[0].res_id});
                 }
                 console.log(res.data);
             })
@@ -275,7 +276,7 @@ export default class Notification extends Component {
                 }
                 <div style={{position: 'fixed', bottom: 5, left: 0, width: '100%'}}>
 
-                    {!this.state.sender &&
+                    {this.state.sender &&
                          <button disabled={!this.state.cart.length} style={{width: '100%'}} className="btn btn-danger" onClick={this.onSubmit}>
                             Submit
                         </button>

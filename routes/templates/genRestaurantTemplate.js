@@ -1,7 +1,7 @@
 const Restaurant = require('../../model/Restaurants');
 const Food = require('../../model/Foods');
 
-let SERVER_URL = "https://ancient-fjord-45295.herokuapp.com/";
+let SERVER_URL = "https://vast-sea-55801.herokuapp.com/";
 
 module.exports.genRestaurantByRegion = function (region, index, callback) {
     let perPage = 4;
