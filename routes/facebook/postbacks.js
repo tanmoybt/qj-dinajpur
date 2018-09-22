@@ -98,6 +98,7 @@ module.exports.postbackProcessor = function (sender, postback) {
 
     else if (postback.payload === 'VIEW_CART_POSTBACK') {
         console.log('cart : ' + postback.payload);
+        console.log(pipeline.data[sender]);
         if (pipeline.data[sender] && pipeline.data[sender].foods) {
             request.sendRequest(sender, genCart.genCartCarousel(pipeline.data[sender].restaurant.name, pipeline.data[sender].foods));
         }

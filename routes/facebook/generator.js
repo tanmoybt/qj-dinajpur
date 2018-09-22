@@ -2,6 +2,8 @@ const request = require('./requests');
 const pipeline = require('./pipeline');
 const apiai = require('./apiai');
 
+const {ObjectId} = require('mongodb');
+
 module.exports.foodAttending = function(err, sender, res, food){
 	if (err || !food) return;
 
@@ -34,6 +36,11 @@ module.exports.foodAttending = function(err, sender, res, food){
 module.exports.foodFromMenu = function(sender, foods, restaurant, res_id){
     pipeline.setSenderData(sender);
     if (!foods.length || !pipeline.data[sender].restaurant) return;
+
+    foods.forEach(function(food){
+        food.food_id = ObjectId(food.food_id);
+        food.size_id = ObjectId(food.size_id);
+    })
 
     pipeline.data[sender].foods = foods;
     pipeline.data[sender].restaurant = { index: 0,

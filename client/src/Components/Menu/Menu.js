@@ -113,7 +113,6 @@ export default class Notification extends Component {
                     });
                     that.setState({foods: res.data, res_id: res.data[0].foods[0].res_id});
                 }
-                console.log(res.data);
             })
             .catch(err => {
                 console.log(err);
