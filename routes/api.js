@@ -357,7 +357,7 @@ apiRouter.route('/cartdata')
     });
 
 
-const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAIsqPdoRxn8WumndMZBUFCuvvUguFUPS0V9LL7A13SbqCPzWbP77weIJhW9W9X6pXn6TmfaHaJhVRlFGcqo087hjxBXYPVfWSP0lg1RsO6jk4PCMZCxUZC9vd8zgdkLgGwY8racKtv3WB4yZA0KSgAEArXhqYAZDZD';
+const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAOmeKajr99VWHjmdj3YQ3OcVHZBBVl6aTZCNcyA3xZAHJLCE3vKIHmMFEuCZBsWvrFFs01r7WVaVMP6zhHPgmlcFAHjIxjp34tgPQngnH6IIzdwclL9sTZBMraFk7Cq44tOu2UuXtpK4fUwk9XACMKll7sK6PSQZDZD';
 
 function sendRequestcall(sender, messageData, callback) {
     request({
@@ -388,12 +388,6 @@ function makeTemplate(imgLink, adText) {
                     "title": "Order from Foodbot today and enjoy the offer",
                     "subtitle": adText,
                     "image_url": imgLink,
-                    "default_action": {
-                        "type": "web_url",
-                        "url": "https://4030a31a.ngrok.io/menu/",
-                        "messenger_extensions": true,
-                        "webview_height_ratio": "TALL"
-                      },
                     "buttons": [
                         {
                             "type": "postback",
