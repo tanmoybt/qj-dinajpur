@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const apiRouter = express.Router();
 const generator = require('./facebook/generator');
+const settings = require('../settings');
 
 const Restaurant = require('../model/Restaurants');
 const Food = require('../model/Foods');
@@ -357,7 +358,7 @@ apiRouter.route('/cartdata')
     });
 
 
-const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAOmeKajr99VWHjmdj3YQ3OcVHZBBVl6aTZCNcyA3xZAHJLCE3vKIHmMFEuCZBsWvrFFs01r7WVaVMP6zhHPgmlcFAHjIxjp34tgPQngnH6IIzdwclL9sTZBMraFk7Cq44tOu2UuXtpK4fUwk9XACMKll7sK6PSQZDZD';
+const PAGE_ACCESS_TOKEN = settings.PAGE_ACCESS_TOKEN;
 
 function sendRequestcall(sender, messageData, callback) {
     request({

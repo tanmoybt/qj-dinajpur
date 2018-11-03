@@ -1,6 +1,7 @@
 const request = require('request');
+const settings = require("../../settings");
 
-const PAGE_ACCESS_TOKEN = 'EAAZAgcMnsu28BAOmeKajr99VWHjmdj3YQ3OcVHZBBVl6aTZCNcyA3xZAHJLCE3vKIHmMFEuCZBsWvrFFs01r7WVaVMP6zhHPgmlcFAHjIxjp34tgPQngnH6IIzdwclL9sTZBMraFk7Cq44tOu2UuXtpK4fUwk9XACMKll7sK6PSQZDZD';
+const PAGE_ACCESS_TOKEN = settings.PAGE_ACCESS_TOKEN;
 
 module.exports.sendRequest = function(sender, messageData) {
     request({

@@ -1,7 +1,8 @@
 const Restaurant = require('../../model/Restaurants');
 const Food = require('../../model/Foods');
+const settings = require('../../settings');
 
-let SERVER_URL = "https://f0e99a60.ngrok.io/";
+let SERVER_URL = settings.SERVER_URL;
 
 module.exports.genRestaurantByRegion = function (region, index, callback) {
     let perPage = 4;

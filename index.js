@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const apiai = require("./routes/facebook/apiai");
+const settings = require("./settings");
 
 const entities = require("./entities");
 
@@ -12,7 +13,7 @@ const app = express();
 mongoose.Promise = require("bluebird");
 mongoose
   .connect(
-    "mongodb://tanmoy12:asdfgh123456@ds241530.mlab.com:41530/qjdj",
+    settings.dbUrl,
     { useMongoClient: true }
   )
   .then(() => {

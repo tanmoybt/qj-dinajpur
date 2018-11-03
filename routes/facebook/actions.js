@@ -77,7 +77,7 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                 else {
                     if (results.attachment.payload) {
                         
-                        pipeline.data[sender].location.regions.push(res[1]);
+                        pipeline.data[sender].location.regions.push(parameters.region);
 
                         request.sendRequest(sender, results);
                         setLastAction(sender, 'doNothing', null, []);
@@ -156,14 +156,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                     }
                 });
             })
-        // }
-        // else {
-        //     genLoc.genGetLocation(function(err, messageData){
-        //         if(!err){
-        //             request.sendRequest(sender, messageData);
-        //         }
-        //     });
-        // }
     }
 
     else if(action === "showFoodsOnIngredientFood"){
@@ -208,14 +200,6 @@ module.exports.actionsProcessor= function (sender, action, speech, parameters, r
                     });
                 });
             }
-        // }
-        // else {
-        //     genLoc.genGetLocation(function(err, messageData){
-        //         if(!err){
-        //             request.sendRequest(sender, messageData);
-        //         }
-        //     });
-        // }
     }
 
     else if(action === 'showFoodsOnFoodsRestaurants'){
