@@ -55,7 +55,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
 
 curl -X POST -H "Content-Type: application/json" -d '{
   "whitelisted_domains":[
-  "https://e6bf343d.ngrok.io"
+  "https://6454895f.ngrok.io"
   ]
 }' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=EAAZAgcMnsu28BAOmeKajr99VWHjmdj3YQ3OcVHZBBVl6aTZCNcyA3xZAHJLCE3vKIHmMFEuCZBsWvrFFs01r7WVaVMP6zhHPgmlcFAHjIxjp34tgPQngnH6IIzdwclL9sTZBMraFk7Cq44tOu2UuXtpK4fUwk9XACMKll7sK6PSQZDZD" 
 
@@ -121,3 +121,26 @@ curl -X POST -H "Content-Type: application/json" -d '{
     "payload":"GET_STARTED_PAYLOAD"
 }
 }' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=EAAZAgcMnsu28BAOmeKajr99VWHjmdj3YQ3OcVHZBBVl6aTZCNcyA3xZAHJLCE3vKIHmMFEuCZBsWvrFFs01r7WVaVMP6zhHPgmlcFAHjIxjp34tgPQngnH6IIzdwclL9sTZBMraFk7Cq44tOu2UuXtpK4fUwk9XACMKll7sK6PSQZDZD" 
+
+
+
+curl -X POST -H "Content-Type: application/json" -d '{    
+  "messages": [
+    {
+      "attachment":{
+        "type":"template",
+        "payload":{
+          "template_type":"generic",
+          "elements":[
+             {
+              "title":"Welcome to Our Marketplace!",
+              "image_url":"https://www.facebook.com/jaspers.png",
+              "subtitle":"Fresh fruits and vegetables. Yum.",
+                  
+            }
+          ]
+        }       
+      }
+    }
+  ]
+}' "https://graph.facebook.com/v2.11/me/message_creatives?access_token=EAAZAgcMnsu28BAK6A4XhI6fAEeUrPyx1tuKcEhgBBZA5TVeV81EXuh93GDlRbgsRGaZAr4eBbeG4YgRmLIQLODiaOXFJ3AWFyLQh5UK6x2rgPjvZBPYoxQYuZAyC8PjBc45KCcOzbskukGVW1D0UDIXgqVnaoLe1YeNNFA9vnKZAD9sf3xQk36rw9LLKPtCw0ZD"
